@@ -21,26 +21,42 @@ class OpenAIProvider(AIProvider):
 
     async def get_answer(self, messages: list, image_url: str = None) -> str:
         try:
-            # Если передана картинка, модифицируем последнее сообщение пользователя
+            logger.info(f"AI Provider получил: image_url={image_url}")
+            
+            # --- ШАГ 3: Подготовка контента для Vision ---
             if image_url and messages:
-                last_msg = messages[-1]
-                if last_msg['role'] == 'user':
-                    # Превращаем текст в массив контента с текстом и картинкой
-                    last_msg['content'] = [
-                        {"type": "text", "text": last_msg['content']},
-                        {"type": "image_url", "image_url": {"url": image_url}}
-                    ]
+                # Ищем последнее сообщение пользователя, чтобы прикрепить к нему фото
+                for i in range(len(messages) - 1, -1, -1):
+                    if messages[i]['role'] == 'user':
+                        current_content = messages[i]['content']
+                        
+                        # Если content уже строка, превращаем его в список для Vision API
+                        if isinstance(current_content, str):
+                            messages[i]['content'] = [
+                                {
+                                    "type": "text", 
+                                    "text": current_content if current_content else "Что на этом изображении?"
+                                },
+                                {
+                                    "type": "image_url", 
+                                    "image_url": {"url": image_url}
+                                }
+                            ]
+                        break 
+            # --- Конец правки ---
 
-            logger.info(f"Запрос к NeuroAPI (Vision: {'Да' if image_url else 'Нет'})...")
             response = await self.client.chat.completions.create(
-                model="gpt-4o-mini",
+                model="gpt-4o",  # gpt-4o лучше всего работает с картинками
                 messages=messages,
-                max_tokens=10000
+                temperature=0.7,
+                max_tokens=1000
             )
+            
             return response.choices[0].message.content
+            
         except Exception as e:
             logger.error(f"Ошибка NeuroAPI: {e}")
-            return "🤖 Кажется, на линии помехи. Попробуйте еще раз!"
+            return "🤖 Не удалось получить ответ от нейросети."
 
 class G4FProvider(AIProvider):
     def __init__(self):

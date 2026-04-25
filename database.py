@@ -11,7 +11,6 @@ class DatabaseManager:
         try:
             self.pool = await asyncpg.create_pool(DB_DSN)
             async with self.pool.acquire() as conn:
-                # Объединяем создание всех таблиц в один блок
                 await conn.execute('''
                     -- Таблица пользователей и лимитов
                     CREATE TABLE IF NOT EXISTS users (
@@ -19,9 +18,13 @@ class DatabaseManager:
                         used_queries INTEGER DEFAULT 0,
                         available_queries INTEGER DEFAULT 10,
                         total_queries INTEGER DEFAULT 0,
-                        subscription_type TEXT DEFAULT 'free',
+                        subscription_type TEXT DEFAULT 'inactive',
                         last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     );
+                    
+                    -- Добавляем колонку "Подписка", если она отсутствует (для существующих БД)
+                    ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_status TEXT DEFAULT 'inactive';
+                    
                     CREATE INDEX IF NOT EXISTS idx_user_id ON users(user_id);
 
                     -- Таблица истории сообщений (память)
@@ -34,7 +37,7 @@ class DatabaseManager:
                     );
                     CREATE INDEX IF NOT EXISTS idx_history_user ON chat_history(user_id);
                 ''')
-            logger.info("Пул PostgreSQL и таблицы инициализированы.")
+            logger.info("Пул PostgreSQL и таблицы инициализированы с полем подписки.")
         except Exception as e:
             logger.error(f"Ошибка подключения к БД: {e}")
             raise

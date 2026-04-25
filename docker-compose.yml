@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  # Сервис базы данных
+  db:
+    image: postgres:15
+    container_name: gpt_bot_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: NoForgot_938
+      POSTGRES_DB: gpt_bot_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # Сервис самого бота
+  bot:
+    build: .
+    container_name: gpt_bot_app
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    environment:
+      - PYTHONUNBUFFERED=1
+
+volumes:
+  postgres_data:

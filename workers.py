@@ -56,22 +56,38 @@ class ProcessManager:
             # 2. Лимиты из БД
             remaining_queries = await db.check_and_update_user(user_id)
             if remaining_queries <= 0 and user_id != ADMIN_ID:
-                await bot.send_message(chat_id=chat_id, text="❌ Лимит запросов исчерпан.")
+                reply_markup = [{
+                        "type": "inline_keyboard",
+                        "payload": {
+                            "buttons": [[
+                                {"type": "callback", "text": "Подписки", "payload": "see_subscriptions"},
+                                {"type": "callback", "text": "Настройки", "payload": "settings"}
+                            ]]
+                        }
+                    }]
+                await bot.send_message(
+                    chat_id=chat_id,
+                    text="❌ Лимит запросов исчерпан. \n"\
+                        "Для продолжения общения оформите подписку",
+                    reply_markup=reply_markup
+                    )
                 return
 
-            # 3. Обработка изображений (Исправлено под структуру MAX API)
+            # 3. Извлекаем фото (если есть)
             image_url = None
             if attachments:
-                # logger.info(f"Анализ вложений: {attachments}")
-                logger.info(f"Анализ вложений...")
-                for attach in attachments:
-                    # В MAX ссылка прячется внутри payload
-                    payload = attach.get('payload', {})
-                    url = payload.get('url')
+                logger.info(f"Получено вложений: {len(attachments)}")
+                for att in attachments:
+                    att_type = str(att.get('type', '')).lower()
+                    payload = att.get('payload', {})
                     
-                    if attach.get('type') == 'image' and url:
+                    # Пробуем достать URL из payload или из корня аттача
+                    url = payload.get('url') or att.get('url')
+                    
+                    # Согласно скриншоту, тип может быть 'image'
+                    if att_type in ['image', 'photo', 'file'] and url:
                         image_url = url
-                        logger.info(f"Ура! Ссылка на фото получена: {image_url}")
+                        logger.info(f"URL картинки найден: {image_url}")
                         break
 
             # 4. Контекст памяти
@@ -79,15 +95,37 @@ class ProcessManager:
             
             # Важно: если текста нет (пользователь скинул только фото), 
             # добавляем дефолтный вопрос, чтобы модель понимала, что делать.
-            current_text = user_text if user_text else "Что на этом изображении?"
-            full_messages = [SYSTEM_PROMPT] + history + [{"role": "user", "content": current_text}]
+            if not user_text and image_url:
+                user_text = "Что на этом изображении?"
+            
+            if not user_text:
+                return
+
+            full_messages = [SYSTEM_PROMPT] + history + [{"role": "user", "content": user_text}]
+
+            # 5. Отправляем заглушку
+            stub_text = "🤖 Думаю..."
+            if image_url:
+                stub_text = "🖼 Анализирую изображение..."
+            
+            # Нам нужно, чтобы send_message возвращал ID созданного сообщения
+            # Для этого немного поправим bot_client ниже, а пока представим, что он возвращает ID
+            stub_msg_id = await bot.send_message(chat_id=chat_id, text=stub_text)
 
             # 5. Запрос к ИИ (передаем URL картинки, если он есть)
             logger.info(f"Запрос к ИИ для чата {chat_id}. Контекст: {len(full_messages)} сообщ.")
             ai_response = await brain.get_answer(full_messages, image_url=image_url)
 
-            # 6. Отправка и сохранение
-            await bot.send_message(chat_id=chat_id, text=ai_response)
+           # 7. Заменяем заглушку на реальный ответ
+            if stub_msg_id:
+                logger.info(f"Пытаюсь отредактировать сообщение {stub_msg_id}")
+                success = await bot.edit_message(chat_id, stub_msg_id, ai_response)
+                if not success:
+                    await bot.send_message(chat_id=chat_id, text=ai_response)
+            else:
+                # Если мы здесь, значит stub_msg_id был None изначально
+                logger.warning("Заглушка не была создана или ID не получен, шлю новым сообщением")
+                await bot.send_message(chat_id=chat_id, text=ai_response)
             
             # Сохраняем в историю текст пользователя (или пометку о фото)
             log_text = user_text if user_text else "[Изображение]"

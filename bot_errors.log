@@ -31,3 +31,9 @@
 2026-04-23 20:48:53,223 - gpt_bot - ERROR - Ошибка в обработчике вебхука: 'list' object has no attribute 'get'
 2026-04-23 20:51:59,263 - gpt_bot - ERROR - Ошибка в обработчике вебхука: list index out of range
 2026-04-23 21:03:43,361 - gpt_bot - ERROR - Ошибка в обработчике вебхука: 'list' object has no attribute 'get'
+2026-04-24 13:11:54,797 - gpt_bot - ERROR - Не удалось зарегистрировать вебхук: Cannot connect to host platform-api.max.ru:443 ssl:default [getaddrinfo failed]
+2026-04-25 23:23:34,672 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"proto.payload","message":"Failed to convert value: 'None'"}
+2026-04-25 23:26:03,304 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"proto.payload","message":"Failed to convert value: 'None'"}
+2026-04-25 23:30:16,841 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"proto.payload","message":"Failed to convert value: 'None'"}
+2026-04-25 23:31:39,698 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"proto.payload","message":"Failed to convert value: 'None'"}
+2026-04-25 23:52:11,131 - gpt_bot - ERROR - Ошибка подключения к БД: [Errno 11001] getaddrinfo failed

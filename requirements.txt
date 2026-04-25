@@ -1,0 +1,6 @@
+aiohttp
+asyncpg
+apscheduler
+openai
+g4f
+httpx
