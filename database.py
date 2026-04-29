@@ -109,8 +109,7 @@ class DatabaseManager:
                 UPDATE users 
                 SET subscription_status = $1, 
                     used_queries = 0,
-                    last_active = CURRENT_TIMESTAMP 
-                               
+                    last_active = CURRENT_TIMESTAMP, 
                     subscription_start = CURRENT_TIMESTAMP,
                     -- Прибавляем дни к текущему времени прямо в SQL
                     subscription_end = CURRENT_TIMESTAMP + ($3 || ' days')::interval
