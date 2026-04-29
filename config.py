@@ -1,6 +1,10 @@
 import os
 
-TOKEN = "f9LHodD0cOKpRm54dQO2ji8dNZcUtkJSpeFRWkP98hwIPZO3R9PtiSg759pxVK7jWQNNCePOp5eldQ8_MpDN"
+# локальный запуск
+# TOKEN = "f9LHodD0cOKpRm54dQO2ji8dNZcUtkJSpeFRWkP98hwIPZO3R9PtiSg759pxVK7jWQNNCePOp5eldQ8_MpDN"
+
+# запуск на серваке
+TOKEN = "f9LHodD0cOJJRiHaYG-mG1_HdoxpzU-e4nyNFAv7RiLsJ6BGBunLQsdCEMlY5wco6ZBJwg4KIcOtSf_DBp8q"
 
 # локальный запуск
 # DB_DSN = "postgresql://postgres:NoForgot_938@localhost:5432/gpt_bot_db"
