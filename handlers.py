@@ -5,10 +5,54 @@ from logger_config import logger
 from workers import worker_manager
 from config import WEBHOOK_PATH
 from database import db # Импортируем базу для очистки
+from payments import create_payment_link # <-- Вот этот импорт спасет мир!
+from subscriptions_config import AVAILABLE_SUBSCRIPTIONS, DEFAULT_SUBSCRIPTION
+from datetime import datetime, timedelta
 
 class WebhookHandler:
     def __init__(self, bot):
         self.bot = bot
+
+    # handlers.py
+
+    async def handle_yookassa_webhook(self, request):
+        try:
+            data = await request.json()
+            # Проверяем, что это уведомление об успешном платеже
+            if data.get('event') == 'payment.succeeded':
+                payment_obj = data.get('object', {})
+                metadata = payment_obj.get('metadata', {})
+                
+                user_id = metadata.get('user_id')
+                chat_id = metadata.get('chat_id')
+                sub_id = metadata.get('sub_id')
+                
+                if user_id and sub_id:
+                    # 1. Получаем данные о подписке из конфига
+                    from subscriptions_config import AVAILABLE_SUBSCRIPTIONS
+                    sub_info = AVAILABLE_SUBSCRIPTIONS.get(sub_id, {})
+                    duration = sub_info.get('duration_days', 30) # 30 дней по умолчанию
+                    
+                    # 2. Обновляем статус пользователя в БД
+                    # Предположим, у вас есть метод update_subscription в database.py
+                    await db.update_user_subscription(user_id, sub_id, duration) 
+                    
+
+                    expiry_date = (datetime.now() + timedelta(days=duration)).strftime("%d.%m.%Y")
+                    # 3. Отправляем уведомление пользователю
+                    success_text = (
+                        f'✅ **Оплата прошла успешно!**\n\n'
+                        f'Подписка: "{sub_info.get('name')}" активирована.\n'
+                        f'Действует до: {expiry_date}'
+                    )
+                    await self.bot.send_message(chat_id, success_text)
+                    
+                    logger.info(f"Подписка {sub_id} активирована для пользователя {user_id}")
+            
+            return web.Response(status=200) # ЮKassa должна получить 200 OK
+        except Exception as e:
+            logger.error(f"Ошибка в вебхуке ЮKassa: {e}")
+            return web.Response(status=200)
 
     async def handle_max_webhook(self, request):
         try:
@@ -100,6 +144,7 @@ class WebhookHandler:
                     return web.Response(status=200)
 
                 if final_cmd == "/help":
+                    await db.deactivate_expired_subscriptions("inactive")
                     help_text = "📖 *Доступные команды:*\n/start\n/clear\n/help"
                     # Формат клавиатуры из твоего предыдущего сообщения
                     reply_markup = [{
@@ -137,7 +182,81 @@ class WebhookHandler:
                         "Это наш бот. Вы можете задавать"\
                         " ему любые вопросы и отправлять картинки")
                     return web.Response(status=200)
+                
+                if final_cmd == "see_subscriptions":
+                    # Формируем текст со списком всех тарифов
+                    text = "🌟 **Доступные тарифные планы:**\n\n"
+                    buttons_rows = []
 
+                    for sub_id, info in AVAILABLE_SUBSCRIPTIONS.items():
+                        text += f'{info['name']} за {info['price']} руб.\n\n'
+                        
+                        # Создаем кнопку для каждой подписки. 
+                        # При нажатии бот получит payload вида 'buy_sub_month'
+                        buttons_rows.append([
+                            {
+                                "type": "callback", 
+                                "text": f"{info['requests']} запросов/день, {info['price']}₽", 
+                                "payload": f"buy_{sub_id}"
+                            }
+                        ])
+
+                    reply_markup = [{
+                        "type": "inline_keyboard",
+                        "payload": {
+                            "buttons": buttons_rows
+                        }
+                    }]
+                    
+                    await self.bot.send_message(chat_id, text, reply_markup=reply_markup)
+                    return web.Response(status=200)
+                
+                # --- ОБРАБОТКА НАЖАТОЙ КНОПКИ ОПЛАТЫ ПОДПИСКИ ---
+                if final_cmd.startswith("buy_"):
+                    sub_id = final_cmd.replace("buy_", "")
+                    
+                    # Здесь мы наконец вызываем функцию из payments.py
+                    pay_url = await create_payment_link(sub_id, user_id, chat_id)
+
+                    if "Ошибка" in pay_url:
+                        await self.bot.send_message(chat_id, pay_url)
+                        return web.Response(status=200)
+
+                    reply_markup = [{
+                        "type": "inline_keyboard",
+                        "payload": {
+                            "buttons": [[
+                                {"type": "link", "text": "💳 Оплатить", "url": pay_url}
+                            ]]
+                        }
+                    }]
+                    
+                    sub_name = AVAILABLE_SUBSCRIPTIONS[sub_id]['name']
+                    await self.bot.send_message(chat_id, f"Вы выбрали: {sub_name}\nДля оплаты нажмите на кнопку:", reply_markup=reply_markup)
+                    return web.Response(status=200)
+                # --------------------------
+
+                if final_cmd == "subscription_status":
+                    # 1. Добавляем await перед вызовом функции
+                    user_data = await db.get_user(user_id)
+                    
+                    if user_data is None:
+                        await db.register_user(user_id)
+                        # 2. Используем chat_id вместо user_id для отправки
+                        await self.bot.send_message(chat_id, "Вам доступен пробный период\n\n"
+                            "Приобрести подписку можно по команде /help")
+                    else:
+                        # Достаем статус из словаря (get_user возвращает запись из БД)
+                        sub_id = user_data.get('subscription_status', 'inactive')
+                        sub_name = AVAILABLE_SUBSCRIPTIONS[sub_id]['name']
+                        await self.bot.send_message(chat_id, f'Активная подписка: {sub_name}')
+                    
+                    return web.Response(status=200)
+                        
+                if final_cmd == "support":
+                    support_url = "https://max.ru/u/f9LHodD0cOJXVUzeev1dZIA1PzKBWw0LlmNLaBSmG-2TUd6cMHvZLgojjsU"
+                    await self.bot.send_message(chat_id, f'Чат техподдержки:\n\n{support_url}')
+                 
             # Если это не команда, а обычное общение с ИИ
             if update_type == 'message_created' and (text or attachments):
                 asyncio.create_task(
@@ -149,6 +268,12 @@ class WebhookHandler:
             logger.error(f"Ошибка вебхука: {e}", exc_info=True)
             return web.Response(status=200)
 
+# handlers.py
+
 def setup_handlers(app, bot):
     handler = WebhookHandler(bot)
+    # Основной вебхук MAX
     app.router.add_post(WEBHOOK_PATH, handler.handle_max_webhook)
+    
+    # КРИТИЧНО: Добавь этот маршрут для ЮKassa
+    app.router.add_post('/yookassa-webhook', handler.handle_yookassa_webhook)

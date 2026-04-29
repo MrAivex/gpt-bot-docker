@@ -42,6 +42,18 @@ class ProcessManager:
         try:
             logger.info(f"--- ЗАПУСК ЛОГИКИ ДЛЯ {user_id} ---")
 
+            # --- ВОТ СЮДА ВСТАВЛЯЕМ ПРОВЕРКУ ---
+            user_data = await db.get_user(user_id)
+            if not user_data:
+                # Если юзера нет в базе, создаем его (автоматически через твой метод)
+                user_data = await db.get_or_create_user(user_id)
+
+            # Проверяем лимиты
+            if user_data['subscription_status'] == 'inactive' and user_data['used_queries'] >= user_data['available_queries']:
+                await bot.send_message(chat_id, "🚀 **Лимит бесплатных запросов исчерпан!**\n\nОформите подписку в меню, чтобы продолжить общение без ограничений.")
+                return 
+            # -----------------------------------
+
             # 1. Защита от спама (Cooldown)
             now = datetime.now()
             last_msg_time = user_cooldowns.get(user_id)

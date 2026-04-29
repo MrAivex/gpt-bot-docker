@@ -4,3 +4,4 @@ apscheduler
 openai
 g4f
 httpx
+yookassa
