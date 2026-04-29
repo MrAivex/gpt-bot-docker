@@ -41,9 +41,9 @@ class WebhookHandler:
                     expiry_date = (datetime.now() + timedelta(days=duration)).strftime("%d.%m.%Y")
                     # 3. Отправляем уведомление пользователю
                     success_text = (
-                        f'✅ **Оплата прошла успешно!**\n\n'
-                        f'Подписка: "{sub_info.get('name')}" активирована.\n'
-                        f'Действует до: {expiry_date}'
+                        f"✅ **Оплата прошла успешно!**\n\n"
+                        f"Подписка: '{sub_info.get('name')}' активирована.\n"
+                        f"Действует до: {expiry_date}"
                     )
                     await self.bot.send_message(chat_id, success_text)
                     
@@ -196,7 +196,7 @@ class WebhookHandler:
                         buttons_rows.append([
                             {
                                 "type": "callback", 
-                                "text": f"{info['requests']} запросов/день, {info['price']}₽", 
+                                "text": f"{info['requests']} запросов/день, {info['price']} руб.", 
                                 "payload": f"buy_{sub_id}"
                             }
                         ])
@@ -249,13 +249,13 @@ class WebhookHandler:
                         # Достаем статус из словаря (get_user возвращает запись из БД)
                         sub_id = user_data.get('subscription_status', 'inactive')
                         sub_name = AVAILABLE_SUBSCRIPTIONS[sub_id]['name']
-                        await self.bot.send_message(chat_id, f'Активная подписка: {sub_name}')
+                        await self.bot.send_message(chat_id, f"Активная подписка: {sub_name}")
                     
                     return web.Response(status=200)
                         
                 if final_cmd == "support":
                     support_url = "https://max.ru/u/f9LHodD0cOJXVUzeev1dZIA1PzKBWw0LlmNLaBSmG-2TUd6cMHvZLgojjsU"
-                    await self.bot.send_message(chat_id, f'Чат техподдержки:\n\n{support_url}')
+                    await self.bot.send_message(chat_id, f"Чат техподдержки:\n\n{support_url}")
                  
             # Если это не команда, а обычное общение с ИИ
             if update_type == 'message_created' and (text or attachments):
