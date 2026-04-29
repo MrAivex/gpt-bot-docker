@@ -189,7 +189,7 @@ class WebhookHandler:
                     buttons_rows = []
 
                     for sub_id, info in AVAILABLE_SUBSCRIPTIONS.items():
-                        text += f'{info['name']} за {info['price']} руб.\n\n'
+                        text += f"{info['name']} за {info['price']} руб.\n\n"
                         
                         # Создаем кнопку для каждой подписки. 
                         # При нажатии бот получит payload вида 'buy_sub_month'
