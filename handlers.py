@@ -248,8 +248,22 @@ class WebhookHandler:
                     else:
                         # Достаем статус из словаря (get_user возвращает запись из БД)
                         sub_id = user_data.get('subscription_status', 'inactive')
-                        sub_name = AVAILABLE_SUBSCRIPTIONS[sub_id]['name']
-                        await self.bot.send_message(chat_id, f"Активная подписка: {sub_name}")
+                        if sub_id == 'inactive':
+                            await self.bot.send_message(chat_id, "У вас нет активной подписки.\n\n"
+                                                                "Вы можете выбрать тариф в меню /help")
+                        else:
+                            # Если подписка есть, пытаемся достать её название
+                            sub_info = AVAILABLE_SUBSCRIPTIONS.get(sub_id)
+                            if sub_info:
+                                sub_name = sub_info['name']
+                                # Если добавили дату окончания, выводим и её
+                                end_date = user_data.get('subscription_end')
+                                date_str = f"\nДействует до: {end_date.strftime('%d.%m.%Y')}" if end_date else ""
+                                
+                                await self.bot.send_message(chat_id, f"🌟 Активная подписка: {sub_name}{date_str}")
+                            else:
+                                # На случай, если в БД какой-то странный ID
+                                await self.bot.send_message(chat_id, "Статус подписки: неактивна.")
                     
                     return web.Response(status=200)
                         
