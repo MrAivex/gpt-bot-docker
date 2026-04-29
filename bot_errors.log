@@ -111,3 +111,20 @@ Traceback (most recent call last):
     available_requests = DEFAULT_SUBSCRIPTION[sub_id]['requests']
                                               ^^^^^^
 UnboundLocalError: cannot access local variable 'sub_id' where it is not associated with a value
+2026-04-29 22:03:40,830 - gpt_bot - ERROR - Ошибка в вебхуке ЮKassa: столбец "subscription_end" имеет тип timestamp without time zone, а выражение - interval
+HINT:  Перепишите выражение или преобразуйте его тип.
+2026-04-29 22:07:31,027 - gpt_bot - ERROR - Ошибка в вебхуке ЮKassa: столбец "subscription_end" имеет тип timestamp without time zone, а выражение - interval
+HINT:  Перепишите выражение или преобразуйте его тип.
+2026-04-29 22:07:34,586 - gpt_bot - ERROR - Ошибка в вебхуке ЮKassa: столбец "subscription_end" имеет тип timestamp without time zone, а выражение - interval
+HINT:  Перепишите выражение или преобразуйте его тип.
+2026-04-29 22:26:16,072 - gpt_bot - ERROR - Ошибка в вебхуке ЮKassa: the server expects 3 arguments for this query, 4 were passed
+HINT:  Check the query against the passed list of arguments.
+2026-04-29 22:32:15,138 - gpt_bot - ERROR - Ошибка в вебхуке ЮKassa: DatabaseManager.update_user_subscription() missing 1 required positional argument: 'subscription_end'
+2026-04-29 22:32:28,928 - gpt_bot - ERROR - Ошибка в вебхуке ЮKassa: DatabaseManager.update_user_subscription() missing 1 required positional argument: 'subscription_end'
+2026-04-29 22:47:51,260 - gpt_bot - ERROR - Ошибка вебхука: 'coroutine' object has no attribute 'get'
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers.py", line 218, in handle_max_webhook
+    subscription_end = await db.get_user(user_id).get("subscription_end", datetime.now())
+                             ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'coroutine' object has no attribute 'get'
+2026-04-29 22:54:42,967 - gpt_bot - ERROR - Ошибка в вебхуке ЮKassa: 'str' object has no attribute 'strftime'

@@ -112,7 +112,7 @@ class DatabaseManager:
                     last_active = CURRENT_TIMESTAMP, 
                     subscription_start = CURRENT_TIMESTAMP,
                     -- Прибавляем дни к текущему времени прямо в SQL
-                    subscription_end = CURRENT_TIMESTAMP + ($3 || ' days')::interval
+                    subscription_end = GREATEST(CURRENT_TIMESTAMP, COALESCE(subscription_end, CURRENT_TIMESTAMP)) + ($3 || ' days')::interval
                 
                 WHERE user_id = $2
             ''', sub_id,  int(user_id), str(duration_days))
@@ -121,7 +121,7 @@ class DatabaseManager:
     async def deactivate_expired_subscriptions(self, sub_id):
         """Сбрасывает просроченные подписки в 'inactive'"""
         async with self.pool.acquire() as conn:
-            logger.info("okak")
+            logger.info(sub_id)
             available_requests = DEFAULT_SUBSCRIPTION[sub_id]['requests']
             # Находим всех, у кого дата окончания меньше текущей и статус не 'inactive'
             result = await conn.execute('''
@@ -129,7 +129,7 @@ class DatabaseManager:
                 SET subscription_status = $1,
                     available_queries = $2,
                     subscription_start = CURRENT_TIMESTAMP,
-                    subscription_end = CURRENT_TIMESTAMP,
+                    subscription_end = NULL,
                     last_active = CURRENT_TIMESTAMP,
                     used_queries = 0
                                         

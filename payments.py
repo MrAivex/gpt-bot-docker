@@ -6,7 +6,7 @@ from subscriptions_config import AVAILABLE_SUBSCRIPTIONS
 # Настройка ЮKassa
 Configuration.configure(SHOP_ID, PAYMENT_TOKEN)
 
-async def create_payment_link(sub_id, user_id, chat_id):
+async def create_payment_link(sub_id, user_id, chat_id, subscription_end):
     sub_info = AVAILABLE_SUBSCRIPTIONS.get(sub_id)
     if not sub_info:
         return "Ошибка: тариф не найден."
@@ -26,6 +26,7 @@ async def create_payment_link(sub_id, user_id, chat_id):
             "capture": True,
             "description": description,
             "metadata": {
+                "subscription_end": str(subscription_end),
                 "user_id": str(user_id),
                 "chat_id": str(chat_id), # Добавьте передачу chat_id
                 "sub_id": sub_id

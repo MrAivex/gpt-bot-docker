@@ -23,22 +23,25 @@ class WebhookHandler:
                 payment_obj = data.get('object', {})
                 metadata = payment_obj.get('metadata', {})
                 
+                
                 user_id = metadata.get('user_id')
                 chat_id = metadata.get('chat_id')
                 sub_id = metadata.get('sub_id')
+                subscription_end = metadata.get('subscription_end')
                 
                 if user_id and sub_id:
                     # 1. Получаем данные о подписке из конфига
                     from subscriptions_config import AVAILABLE_SUBSCRIPTIONS
                     sub_info = AVAILABLE_SUBSCRIPTIONS.get(sub_id, {})
-                    duration = sub_info.get('duration_days', 30) # 30 дней по умолчанию
+                    duration = sub_info.get('duration_days', 31) # 30 дней по умолчанию
                     
                     # 2. Обновляем статус пользователя в БД
                     # Предположим, у вас есть метод update_subscription в database.py
                     await db.update_user_subscription(user_id, sub_id, duration) 
                     
 
-                    expiry_date = (datetime.now() + timedelta(days=duration)).strftime("%d.%m.%Y")
+                    # expiry_date = (datetime.now() + timedelta(days=duration)).strftime("%d.%m.%Y")
+                    expiry_date = (datetime.fromisoformat(subscription_end) + timedelta(days=duration)).strftime("%d.%m.%Y")
                     # 3. Отправляем уведомление пользователю
                     success_text = (
                         f"✅ **Оплата прошла успешно!**\n\n"
@@ -144,7 +147,6 @@ class WebhookHandler:
                     return web.Response(status=200)
 
                 if final_cmd == "/help":
-                    await db.deactivate_expired_subscriptions("inactive")
                     help_text = "📖 *Доступные команды:*\n/start\n/clear\n/help"
                     # Формат клавиатуры из твоего предыдущего сообщения
                     reply_markup = [{
@@ -214,9 +216,11 @@ class WebhookHandler:
                 # --- ОБРАБОТКА НАЖАТОЙ КНОПКИ ОПЛАТЫ ПОДПИСКИ ---
                 if final_cmd.startswith("buy_"):
                     sub_id = final_cmd.replace("buy_", "")
+                    user_abj = await db.get_user(user_id)
+                    subscription_end = user_abj.get("subscription_end", datetime.now())
                     
                     # Здесь мы наконец вызываем функцию из payments.py
-                    pay_url = await create_payment_link(sub_id, user_id, chat_id)
+                    pay_url = await create_payment_link(sub_id, user_id, chat_id, subscription_end)
 
                     if "Ошибка" in pay_url:
                         await self.bot.send_message(chat_id, pay_url)
