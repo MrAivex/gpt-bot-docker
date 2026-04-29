@@ -37,3 +37,77 @@
 2026-04-25 23:30:16,841 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"proto.payload","message":"Failed to convert value: 'None'"}
 2026-04-25 23:31:39,698 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"proto.payload","message":"Failed to convert value: 'None'"}
 2026-04-25 23:52:11,131 - gpt_bot - ERROR - Ошибка подключения к БД: [Errno 11001] getaddrinfo failed
+2026-04-27 22:42:06,817 - gpt_bot - ERROR - Ошибка вебхука: {'type': 'error', 'id': '019dd076-9130-74cf-a523-18a3a90586b4', 'description': 'Receipt is missing or illegal', 'parameter': 'receipt', 'code': 'invalid_request'}
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot\venv\Lib\site-packages\yookassa\client.py", line 54, in request
+    raw_response = self.execute(body, method, path, query_params, request_headers)
+  File "D:\Programingg\VSCodeProjects\gpt_bot\venv\Lib\site-packages\yookassa\client.py", line 87, in execute
+    self.log_response(raw_response.content, self.get_response_info(raw_response), raw_response.headers)
+                                            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "D:\Programingg\VSCodeProjects\gpt_bot\venv\Lib\site-packages\yookassa\client.py", line 179, in get_response_info
+    "raise_for_status": response.raise_for_status(),
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Programingg\VSCodeProjects\gpt_bot\venv\Lib\site-packages\requests\models.py", line 1028, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error:  for url: https://api.yookassa.ru/v3/payments
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot\handlers.py", line 143, in handle_max_webhook
+    pay_url = await create_payment_link(490, "Подписка на месяц", user_id)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Programingg\VSCodeProjects\gpt_bot\payments.py", line 11, in create_payment_link
+    payment = Payment.create({
+        "amount": {"value": f"{amount}.00", "currency": "RUB"},
+    ...<7 lines>...
+        "metadata": {"user_id": str(user_id)}
+    }, idempotency_key)
+  File "D:\Programingg\VSCodeProjects\gpt_bot\venv\Lib\site-packages\yookassa\payment.py", line 66, in create
+    response = instance.client.request(HttpVerb.POST, path, None, headers, params_object)
+  File "D:\Programingg\VSCodeProjects\gpt_bot\venv\Lib\site-packages\yookassa\client.py", line 56, in request
+    self.__handle_error(e.response)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "D:\Programingg\VSCodeProjects\gpt_bot\venv\Lib\site-packages\yookassa\client.py", line 145, in __handle_error
+    raise BadRequestError(raw_response.json())
+yookassa.domain.exceptions.bad_request_error.BadRequestError: {'type': 'error', 'id': '019dd076-9130-74cf-a523-18a3a90586b4', 'description': 'Receipt is missing or illegal', 'parameter': 'receipt', 'code': 'invalid_request'}
+2026-04-27 22:44:53,736 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"proto.payload","message":"Must have only http/https links format in buttons"}
+2026-04-27 22:45:47,043 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"proto.payload","message":"Must have only http/https links format in buttons"}
+2026-04-27 22:46:44,650 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"proto.payload","message":"Must have only http/https links format in buttons"}
+2026-04-27 23:19:12,250 - gpt_bot - ERROR - Ошибка вебхука: DatabaseManager.get_user() takes 2 positional arguments but 3 were given
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot\handlers.py", line 157, in handle_max_webhook
+    sub_status = db.get_user(user_id, {}).get("subscription_type")
+                 ~~~~~~~~~~~^^^^^^^^^^^^^
+TypeError: DatabaseManager.get_user() takes 2 positional arguments but 3 were given
+2026-04-27 23:19:51,800 - gpt_bot - ERROR - Ошибка вебхука: 'coroutine' object has no attribute 'get'
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot\handlers.py", line 157, in handle_max_webhook
+    sub_status = db.get_user(user_id).get("subscription_type")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'coroutine' object has no attribute 'get'
+2026-04-27 23:20:46,868 - gpt_bot - ERROR - Ошибка вебхука: 'coroutine' object has no attribute 'subscription_type'
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot\handlers.py", line 157, in handle_max_webhook
+    sub_status = db.get_user(user_id).subscription_type
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'coroutine' object has no attribute 'subscription_type'
+2026-04-27 23:36:19,691 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"dialog.not.found","message":"error.dialog.notfound"}
+2026-04-28 23:48:34,353 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"proto.payload","message":"Failed to convert value: 'None'"}
+2026-04-28 23:51:19,020 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 283226333 not found"}
+2026-04-29 12:23:12,022 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 283226333 not found"}
+2026-04-29 12:30:14,887 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 283226333 not found"}
+2026-04-29 12:30:35,227 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 283226333 not found"}
+2026-04-29 12:30:54,694 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 283226333 not found"}
+2026-04-29 12:31:52,452 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 283226333 not found"}
+2026-04-29 12:32:16,771 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 283226333 not found"}
+2026-04-29 12:32:43,225 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 283226333 not found"}
+2026-04-29 12:48:36,410 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 283226333 not found"}
+2026-04-29 12:53:27,584 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 283226333 not found"}
+2026-04-29 13:11:16,622 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 283226333 not found"}
+2026-04-29 16:45:13,630 - gpt_bot - ERROR - Ошибка вебхука: cannot access local variable 'sub_id' where it is not associated with a value
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot\handlers.py", line 147, in handle_max_webhook
+    available_requests = DEFAULT_SUBSCRIPTION[sub_id]['requests']
+                                              ^^^^^^
+UnboundLocalError: cannot access local variable 'sub_id' where it is not associated with a value
