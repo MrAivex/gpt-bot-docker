@@ -42,7 +42,7 @@ class WebhookHandler:
                     # 3. Отправляем уведомление пользователю
                     success_text = (
                         f'✅ **Оплата прошла успешно!**\n\n'
-                        f'Подписка: "{sub_info.get('name')}" активирована.\n'
+                        f'Подписка: "{sub_info.get("name")}" активирована.\n'
                         f'Действует до: {expiry_date}'
                     )
                     await self.bot.send_message(chat_id, success_text)
