@@ -1,6 +1,6 @@
 import uuid
 from yookassa import Configuration, Payment
-from config import SHOP_ID, PAYMENT_TOKEN
+from config import SHOP_ID, PAYMENT_TOKEN, RETURN_URL
 from subscriptions_config import AVAILABLE_SUBSCRIPTIONS
 
 # Настройка ЮKassa
@@ -21,7 +21,7 @@ async def create_payment_link(sub_id, user_id, chat_id, subscription_end):
             "amount": {"value": f"{amount}.00", "currency": "RUB"},
             "confirmation": {
                 "type": "redirect",
-                "return_url": "https://max.ru/id973302994385_1_bot" # Ссылка на вашего бота
+                "return_url": f"{RETURN_URL}" # Ссылка на вашего бота
             },
             "capture": True,
             "description": description,

@@ -78,20 +78,51 @@ class DatabaseManager:
         """Проверяет лимиты и обновляет счетчик запросов"""
         # Твой админский фильтр теперь внутри метода
         if user_id == ADMIN_ID:
-            return 999
+            return # Админу ничего не списываем
 
         async with self.pool.acquire() as conn:
-            user = await conn.fetchrow('''
-                INSERT INTO users (user_id) 
-                VALUES ($1) 
-                ON CONFLICT (user_id) DO UPDATE 
-                SET used_queries = users.used_queries + 1, 
-                    total_queries = users.total_queries + 1,
-                    available_queries = users.available_queries - 1,
-                    last_active = CURRENT_TIMESTAMP
-                RETURNING available_queries
-            ''', user_id)
-            return user['available_queries']
+            await conn.execute('''
+            UPDATE users 
+            SET used_queries = used_queries + 1, 
+                total_queries = total_queries + 1,
+                -- Оставляем GREATEST, чтобы лимит просто замер на 0
+                available_queries = GREATEST(0, available_queries - 1),
+                last_active = CURRENT_TIMESTAMP
+            WHERE user_id = $1
+        ''', user_id)
+            
+    # database.py
+
+    async def update_user_field(self, user_id: int, field: str, value):
+        """Универсальный метод обновления поля пользователя"""
+        # Белый список полей для безопасности
+        allowed_fields = {
+            'used_queries', 'available_queries', 'total_queries', 
+            'subscription_status', 'subscription_end', 'subscription_start'
+        }
+        
+        if field not in allowed_fields:
+            raise ValueError(f"Поле {field} недоступно для редактирования")
+
+        async with self.pool.acquire() as conn:
+            # Используем f-строку ТОЛЬКО для имени поля (которое проверено), 
+            # а само значение передаем через параметр $2 для безопасности.
+            query = f"UPDATE users SET {field} = $2 WHERE user_id = $1"
+            await conn.execute(query, user_id, value)
+            logger.info(f"Поле {field} обновлено для юзера {user_id} на значение {value}")
+            
+    async def reset_subscription_limits(self, query):
+        async with self.pool.acquire() as conn:
+            await conn.execute(query)
+
+            query_inactive = '''
+                UPDATE users 
+                SET used_queries = 0
+                WHERE subscription_type = 'inactive' 
+                   OR subscription_end <= CURRENT_TIMESTAMP;
+            '''
+            await conn.execute(query_inactive)
+            logger.info("Лимиты подписчиков динамически обновлены на основе конфига.")
 
     async def save_message(self, user_id: int, role: str, content: str):
         """Сохраняет сообщение в историю (для памяти)"""
@@ -168,6 +199,16 @@ class DatabaseManager:
                 user_id
             )
             logger.info(f"История пользователя {user_id} полностью очищена.")
+
+    #-------АДМИНСКИЕ ЗАПРОСЫ---------------------------------------------------------------
+
+    async def get_total_users_count(self):
+        """Возвращает общее количество зарегистрированных пользователей"""
+        async with self.pool.acquire() as conn:
+            count = await conn.fetchval('SELECT COUNT(*) FROM users')
+            return count
+        
+    #---------------------------------------------------------------------------------------
 
 # Создаем экземпляр для экспорта
 db = DatabaseManager()

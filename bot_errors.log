@@ -128,3 +128,9 @@ Traceback (most recent call last):
                              ^^^^^^^^^^^^^^^^^^^^^^^^
 AttributeError: 'coroutine' object has no attribute 'get'
 2026-04-29 22:54:42,967 - gpt_bot - ERROR - Ошибка в вебхуке ЮKassa: 'str' object has no attribute 'strftime'
+2026-04-30 09:20:52,666 - gpt_bot - ERROR - Ошибка в вебхуке ЮKassa: fromisoformat: argument must be str
+2026-04-30 13:55:49,322 - gpt_bot - ERROR - Ошибка воркера 5787551: 'NoneType' object is not subscriptable
+2026-04-30 16:32:37,814 - gpt_bot - ERROR - Ошибка воркера 283226333: 'NoneType' object is not subscriptable
+2026-04-30 16:37:39,159 - gpt_bot - ERROR - Ошибка воркера 283226333: 'NoneType' object is not subscriptable
+2026-04-30 16:38:33,027 - gpt_bot - ERROR - Ошибка воркера 283226333: 'NoneType' object is not subscriptable
+2026-04-30 22:12:08,030 - gpt_bot - ERROR - Ошибка при обновлении пользователя: 'DatabaseManager' object has no attribute 'update_user_field'

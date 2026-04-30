@@ -3,6 +3,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from database import db
 from logger_config import logger
 from config import TOKEN, WEBHOOK_URL
+from subscriptions_config import RESET_LIMITS_TEXT
 
 # Инициализируем планировщик
 scheduler = AsyncIOScheduler()
@@ -25,6 +26,14 @@ async def check_subscriptions_task():
     except Exception as e:
         logger.error(f"Ошибка в задаче проверки подписок: {e}")
 
+async def reset_query_limits_task():
+    """Фоновая задача для обновления лимитов запросов"""
+    try:
+        logger.info("Обновление лимитов...")
+        await db.reset_subscription_limits(RESET_LIMITS_TEXT)
+    except Exception as e:
+        logger.error(f"Ошибка в задаче обновления лимитов: {e}")
+
 async def on_startup(app):
     """Логика при запуске сервера"""
     # 1. Подключаемся к БД
@@ -46,13 +55,13 @@ async def on_startup(app):
     except Exception as e:
         logger.error(f"Не удалось зарегистрировать вебхук: {e}")
 
-    # 3. Настройка планировщика
+#--------------------ПЛАНИРОВЩИК ЗАДАЧ--------------------------------------------------------------
+    scheduler.add_job(check_subscriptions_task, 'cron', hour=0, minute=30) # Проверка истекших подписок
 
-    # Запускаем проверку итсекших подписок каждый час
-    scheduler.add_job(check_subscriptions_task, 'cron', hour=4, minute=0)
-
-    # Запускаем очистку каждый день в 3:00 ночи
-    scheduler.add_job(scheduled_cleanup, 'cron', hour=3, minute=0)
+    scheduler.add_job(reset_query_limits_task, 'cron', hour=1, minute=0) # обновление лимитов
+   
+    scheduler.add_job(scheduled_cleanup, 'cron', hour=1, minute=0) # Запускаем очистку каждый день в 3:00 ночи по МСК
+#---------------------------------------------------------------------------------------------------
     
     # Также можно добавить один запуск сразу при старте для теста (опционально)
     # scheduler.add_job(scheduled_cleanup) 

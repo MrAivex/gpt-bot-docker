@@ -3,9 +3,9 @@ import asyncio
 from aiohttp import web
 from logger_config import logger
 from workers import worker_manager
-from config import WEBHOOK_PATH
-from database import db # Импортируем базу для очистки
-from payments import create_payment_link # <-- Вот этот импорт спасет мир!
+from config import WEBHOOK_PATH, ADMIN_ID
+from database import db
+from payments import create_payment_link 
 from subscriptions_config import AVAILABLE_SUBSCRIPTIONS, DEFAULT_SUBSCRIPTION
 from datetime import datetime, timedelta
 
@@ -147,7 +147,7 @@ class WebhookHandler:
                     return web.Response(status=200)
 
                 if final_cmd == "/help":
-                    help_text = "📖 *Доступные команды:*\n/start\n/clear\n/help"
+                    help_text = "📖 *Доступные команды:*\n/start\n/help"
                     # Формат клавиатуры из твоего предыдущего сообщения
                     reply_markup = [{
                         "type": "inline_keyboard",
@@ -161,7 +161,8 @@ class WebhookHandler:
                                 {"type": "callback", "text": "Оформить подписку", "payload": "see_subscriptions"}
                             ],
                             [
-                                {"type": "callback", "text": "Поддержка", "payload": "support"}
+                                {"type": "callback", "text": "Поддержка", "payload": "support"},
+                                {"type": "callback", "text": "Мои запросы", "payload": "my_queries"}
                             ]
                             ]
                         }
@@ -274,9 +275,118 @@ class WebhookHandler:
                 if final_cmd == "support":
                     support_url = "https://max.ru/u/f9LHodD0cOJXVUzeev1dZIA1PzKBWw0LlmNLaBSmG-2TUd6cMHvZLgojjsU"
                     await self.bot.send_message(chat_id, f"Чат техподдержки:\n\n{support_url}")
+                    return web.Response(status=200)
+
+                
+                if final_cmd == "my_queries":
+                    query_data = await db.get_user(user_id)
+                    my_queries = query_data.get('available_queries')
+                    await self.bot.send_message(chat_id, f"Доступные запросы: {my_queries}")
+                    return web.Response(status=200)
+
+#-------АДМИНСКИЕ КОМАНДЫ---------------------------------------------------------------
+
+                if text.lower() == "/count" and user_id == ADMIN_ID:
+                    try:
+                        total_users = await db.get_total_users_count()
+                        await self.bot.send_message(
+                            chat_id, 
+                            f"📊 **Статистика бота**\n\n"
+                            f"Всего пользователей в БД: `{total_users}`"
+                        )
+                        return web.Response(status=200)
+                    except Exception as e:
+                        logger.error(f"Ошибка при получении статистики: {e}")
+                        await self.bot.send_message(chat_id, "Ошибка при обращении к базе данных.")
+                        return web.Response(status=200)
+                    
+                #-------АДМИНСКАЯ КОМАНДА: ИНФО О ПОЛЬЗОВАТЕЛЕ-----------------------------------------
+                if text.lower().startswith("/user") and user_id == ADMIN_ID:
+                    try:
+                        # Извлекаем ID из сообщения "/user 111111"
+                        parts = text.split()
+                        if len(parts) < 2:
+                            await self.bot.send_message(chat_id, "⚠️ Формат: `/user id_пользователя`")
+                            return web.Response(status=200)
+
+                        target_id = int(parts[1])
+                        user_info = await db.get_user(target_id)
+
+                        if not user_info:
+                            await self.bot.send_message(chat_id, f"❌ Пользователь с ID `{target_id}` не найден.")
+                        else:
+                            # Формируем красивый отчет
+                            status = user_info.get('subscription_status', 'inactive')
+                            queries_left = user_info.get('available_queries', 0)
+                            total = user_info.get('total_queries', 0)
+                            sub_end = user_info.get('subscription_end')
+                            sub_end_str = sub_end.strftime('%d.%m.%Y %H:%M') if sub_end else "Нет"
+
+                            report = (
+                                f"👤 **Данные пользователя {target_id}:**\n\n"
+                                f"🔹 Статус: `{status}`\n"
+                                f"🔹 Осталось лимитов: `{queries_left}`\n"
+                                f"🔹 Всего запросов: `{total}`\n"
+                                f"🔹 Подписка до: `{sub_end_str}`\n"
+                                f"🔹 Последняя активность: `{user_info.get('last_active').strftime('%d.%m.%Y %H:%M')}`"
+                            )
+                            await self.bot.send_message(chat_id, report)
+
+                        return web.Response(status=200)
+                    except ValueError:
+                        await self.bot.send_message(chat_id, "⚠️ ID должен быть числом.")
+                        return web.Response(status=200)
+                    except Exception as e:
+                        logger.error(f"Ошибка при поиске пользователя {target_id}: {e}")
+                        await self.bot.send_message(chat_id, "Ошибка при обращении к БД.")
+                        return web.Response(status=200)
+
+                if text.lower().startswith("/update") and user_id == ADMIN_ID:
+                    try:
+                        parts = text.split(maxsplit=3) # /update id поле значение
+                        if len(parts) < 4:
+                            await self.bot.send_message(chat_id, "⚠️ Формат: `/update {id} {поле} {значение}`")
+                            return web.Response(status=200)
+
+                        target_id = int(parts[1])
+                        field = parts[2].lower()
+                        raw_value = parts[3]
+                        final_value = raw_value
+
+                        # --- ЛОГИКА ПРИВЕДЕНИЯ ТИПОВ ---
+                        int_fields = ['used_queries', 'available_queries', 'total_queries']
+                        date_fields = ['subscription_end', 'subscription_start']
+
+                        if field in int_fields:
+                            final_value = int(raw_value)
+                        elif field in date_fields:
+                            # Ожидаем формат ДД.ММ.ГГГГ или ГГГГ-ММ-ДД
+                            try:
+                                final_value = datetime.strptime(raw_value, "%d.%m.%Y")
+                            except ValueError:
+                                final_value = datetime.fromisoformat(raw_value)
+                        elif raw_value.lower() == "null":
+                            final_value = None
+
+                        # Вызов метода БД
+                        await db.update_user_field(target_id, field, final_value)
+                        
+                        await self.bot.send_message(chat_id, f"✅ Поле `{field}` для пользователя `{target_id}` успешно обновлено!")
+
+                    except ValueError as e:
+                        await self.bot.send_message(chat_id, f"❌ Ошибка данных: Проверьте формат числа или даты. ({e})")
+                    except Exception as e:
+                        logger.error(f"Ошибка при обновлении пользователя: {e}")
+                        await self.bot.send_message(chat_id, f"❌ Произошла ошибка: {str(e)}")
+                    
+                    return web.Response(status=200)
+                        
+
+#--------------------------------------------------------------------------------------
                  
             # Если это не команда, а обычное общение с ИИ
             if update_type == 'message_created' and (text or attachments):
+                request 
                 asyncio.create_task(
                     worker_manager.process_message(self.bot, chat_id, user_id, text, attachments)
                 )

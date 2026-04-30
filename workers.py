@@ -30,7 +30,7 @@ brain = get_ai_brain("openai", api_key=OPENAI_API_KEY)
 
 SYSTEM_PROMPT = {
     "role": "system", 
-    "content": "Ты — полезный ИИ-ассистент в мессенджере MAX. Отвечай дружелюбно. Ты помнишь контекст предыдущих сообщений."
+    "content": ""
 }
 
 class ProcessManager:
@@ -47,11 +47,8 @@ class ProcessManager:
             if not user_data:
                 # Если юзера нет в базе, создаем его (автоматически через твой метод)
                 user_data = await db.get_or_create_user(user_id)
-
             # Проверяем лимиты
-            if user_data['subscription_status'] == 'inactive' and user_data['used_queries'] >= user_data['available_queries']:
-                await bot.send_message(chat_id, "🚀 **Лимит бесплатных запросов исчерпан!**\n\nОформите подписку в меню, чтобы продолжить общение без ограничений.")
-                return 
+            
             # -----------------------------------
 
             # 1. Защита от спама (Cooldown)
@@ -66,14 +63,13 @@ class ProcessManager:
             user_cooldowns[user_id] = now
 
             # 2. Лимиты из БД
-            remaining_queries = await db.check_and_update_user(user_id)
+            remaining_queries = user_data.get('available_queries')
             if remaining_queries <= 0 and user_id != ADMIN_ID:
                 reply_markup = [{
                         "type": "inline_keyboard",
                         "payload": {
                             "buttons": [[
-                                {"type": "callback", "text": "Подписки", "payload": "see_subscriptions"},
-                                {"type": "callback", "text": "Настройки", "payload": "settings"}
+                                {"type": "callback", "text": "Подписки", "payload": "see_subscriptions"}
                             ]]
                         }
                     }]
@@ -99,7 +95,6 @@ class ProcessManager:
                     # Согласно скриншоту, тип может быть 'image'
                     if att_type in ['image', 'photo', 'file'] and url:
                         image_url = url
-                        logger.info(f"URL картинки найден: {image_url}")
                         break
 
             # 4. Контекст памяти
@@ -124,13 +119,15 @@ class ProcessManager:
             # Для этого немного поправим bot_client ниже, а пока представим, что он возвращает ID
             stub_msg_id = await bot.send_message(chat_id=chat_id, text=stub_text)
 
+#-----------------Обновление лимитов-------------------------------------------
+            await db.check_and_update_user(user_id)
+#-----------------------------------------------------------------------------
+
             # 5. Запрос к ИИ (передаем URL картинки, если он есть)
-            logger.info(f"Запрос к ИИ для чата {chat_id}. Контекст: {len(full_messages)} сообщ.")
             ai_response = await brain.get_answer(full_messages, image_url=image_url)
 
            # 7. Заменяем заглушку на реальный ответ
             if stub_msg_id:
-                logger.info(f"Пытаюсь отредактировать сообщение {stub_msg_id}")
                 success = await bot.edit_message(chat_id, stub_msg_id, ai_response)
                 if not success:
                     await bot.send_message(chat_id=chat_id, text=ai_response)
@@ -143,8 +140,6 @@ class ProcessManager:
             log_text = user_text if user_text else "[Изображение]"
             await db.save_message(user_id, 'user', log_text)
             await db.save_message(user_id, 'assistant', ai_response)
-            
-            logger.info(f"Воркер успешно завершил работу для {user_id}")
 
         except Exception as e:
             logger.error(f"Ошибка воркера {user_id}: {e}")

@@ -34,3 +34,31 @@ AVAILABLE_SUBSCRIPTIONS = {
         "duration_days": 31
     }
 }
+
+def create_reset_limits_text(sub_list):
+    """Динамически сбрасывает счетчики на основе конфига подписок"""
+    
+    # 1. Формируем части CASE для SQL
+    # Мы перебираем все подписки из словаря AVAILABLE_SUBSCRIPTIONS
+    case_parts = []
+    for sub_id, info in sub_list.items():
+        # Добавляем строку вида: WHEN subscription_type = 'sub_5' THEN 5
+        case_parts.append(f"WHEN subscription_type = '{sub_id}' THEN {info['requests']}")
+    
+    # Соединяем все части в одну строку
+    case_statement = "\n                ".join(case_parts)
+
+    # 2. Собираем итоговый SQL запрос
+    query = f'''
+        UPDATE users 
+        SET available_queries = CASE 
+                {case_statement}
+                ELSE available_queries
+            END,
+            used_queries = 0
+        WHERE subscription_end > CURRENT_TIMESTAMP 
+          AND subscription_type != 'inactive'
+    '''
+    return query
+
+RESET_LIMITS_TEXT = create_reset_limits_text(AVAILABLE_SUBSCRIPTIONS)
