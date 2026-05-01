@@ -22,12 +22,14 @@ class DatabaseManager:
                         subscription_type TEXT DEFAULT 'inactive',
                         subscription_start TIMESTAMP,
                         subscription_end TIMESTAMP,
-                        last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                        last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        user_email TEXT
                     );
                                    
                     -- Миграция: добавляем колонки дат, если их нет
                     ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_start TIMESTAMP;
                     ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_end TIMESTAMP;
+                    ALTER TABLE users ADD COLUMN IF NOT EXISTS user_email TEXT;
                     
                     -- Добавляем колонку "Подписка", если она отсутствует (для существующих БД)
                     ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_status TEXT DEFAULT 'inactive';
@@ -65,6 +67,15 @@ class DatabaseManager:
                 SET last_active = CURRENT_TIMESTAMP
             ''', user_id)
             logger.info(f"Пользователь {user_id} проверен/зарегистрирован в БД")
+
+    async def update_user_email(self, user_id: int, email: str):
+        """Сохраняет или обновляет email пользователя"""
+        async with self.pool.acquire() as conn:
+            await conn.execute(
+                'UPDATE users SET user_email = $2 WHERE user_id = $1',
+                user_id, email
+            )
+            logger.info(f"Email для пользователя {user_id} обновлен на {email}")
 
     async def get_user(self, user_id: int):
         """Получает данные пользователя из базы"""

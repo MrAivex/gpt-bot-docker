@@ -6,7 +6,7 @@ from subscriptions_config import AVAILABLE_SUBSCRIPTIONS
 # Настройка ЮKassa
 Configuration.configure(SHOP_ID, PAYMENT_TOKEN)
 
-async def create_payment_link(sub_id, user_id, chat_id, subscription_end):
+async def create_payment_link(sub_id, user_id, chat_id, subscription_end, email):
     sub_info = AVAILABLE_SUBSCRIPTIONS.get(sub_id)
     if not sub_info:
         return "Ошибка: тариф не найден."
@@ -30,6 +30,24 @@ async def create_payment_link(sub_id, user_id, chat_id, subscription_end):
                 "user_id": str(user_id),
                 "chat_id": str(chat_id), # Добавьте передачу chat_id
                 "sub_id": sub_id
+            },
+            "receipt": {
+                "customer": {
+                    "email": email
+                },
+                "items": [
+                    {
+                        "description": f"Доступ к сервису (подписка {sub_id})",
+                        "quantity": "1.00",
+                        "amount": {
+                            "value": f"{amount}.00",
+                            "currency": "RUB"
+                        },
+                        "vat_code": "1",  # 1 — Без НДС (обязательно для ИП на НПД / самозанятых)
+                        "payment_mode": "full_prepayment",
+                        "payment_subject": "service"
+                    }
+                ]
             }
         }, idempotency_key)
 

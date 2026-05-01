@@ -1,4 +1,5 @@
 import time
+import re
 import asyncio
 from aiohttp import web
 from logger_config import logger
@@ -8,6 +9,8 @@ from database import db
 from payments import create_payment_link 
 from subscriptions_config import AVAILABLE_SUBSCRIPTIONS, DEFAULT_SUBSCRIPTION
 from datetime import datetime, timedelta
+
+EMAIL_REGEX = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
 
 class WebhookHandler:
     def __init__(self, bot):
@@ -218,10 +221,21 @@ class WebhookHandler:
                 if final_cmd.startswith("buy_"):
                     sub_id = final_cmd.replace("buy_", "")
                     user_abj = await db.get_user(user_id)
+
+                    if not user_abj.get('user_email'):
+                        await self.bot.send_message(
+                            chat_id, 
+                            "Необходимо указать электронную почту для получения чека, "\
+                            "для этого пришлите её в чат с ботом отдельным сообщением без."\
+                            " Сообщение должно содержать только почту без каких-либо других символов"
+                        )
+                        return web.Response(status=200)
+
                     subscription_end = user_abj.get("subscription_end", datetime.now())
                     
                     # Здесь мы наконец вызываем функцию из payments.py
-                    pay_url = await create_payment_link(sub_id, user_id, chat_id, subscription_end)
+                    us_email = user_abj.get('user_email')
+                    pay_url = await create_payment_link(sub_id, user_id, chat_id, subscription_end, us_email)
 
                     if "Ошибка" in pay_url:
                         await self.bot.send_message(chat_id, pay_url)
@@ -283,6 +297,11 @@ class WebhookHandler:
                     my_queries = query_data.get('available_queries')
                     await self.bot.send_message(chat_id, f"Доступные запросы: {my_queries}")
                     return web.Response(status=200)
+                
+                if re.match(EMAIL_REGEX, text):
+                    await db.update_user_email(user_id, text)
+                    await self.bot.send_message(chat_id, f"✅ Email `{text}` сохранен. Теперь вы можете перейти к оплате.")
+                    return web.Response(status=200)
 
 #-------АДМИНСКИЕ КОМАНДЫ---------------------------------------------------------------
 
@@ -321,10 +340,12 @@ class WebhookHandler:
                             total = user_info.get('total_queries', 0)
                             sub_end = user_info.get('subscription_end')
                             sub_end_str = sub_end.strftime('%d.%m.%Y %H:%M') if sub_end else "Нет"
+                            email = user_info.get('user_email') or "Не указан"
 
                             report = (
                                 f"👤 **Данные пользователя {target_id}:**\n\n"
                                 f"🔹 Статус: `{status}`\n"
+                                f"📧 Email: `{email}`\n"
                                 f"🔹 Осталось лимитов: `{queries_left}`\n"
                                 f"🔹 Всего запросов: `{total}`\n"
                                 f"🔹 Подписка до: `{sub_end_str}`\n"
