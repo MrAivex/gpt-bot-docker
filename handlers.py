@@ -90,7 +90,6 @@ class WebhookHandler:
                 user_info = data.get('user', {})
                 us_start_id = user_info.get('user_id')
                 us_chat_id = data.get('chat_id')
-                logger.info(data)
                 logger.info(f"Новый пользователь {us_start_id} запустил бота!")
                 welcome_text = (
                     "👋 **Добро пожаловать в ИИ-ассистент!**\n\n"
