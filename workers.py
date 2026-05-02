@@ -30,7 +30,7 @@ brain = get_ai_brain("openai", api_key=OPENAI_API_KEY)
 
 SYSTEM_PROMPT = {
     "role": "system", 
-    "content": ""
+    "content": "Ты умный ИИ ассистент"
 }
 
 class ProcessManager:

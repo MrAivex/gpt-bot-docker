@@ -46,7 +46,7 @@ class OpenAIProvider(AIProvider):
             # --- Конец правки ---
 
             response = await self.client.chat.completions.create(
-                model="gpt-4o",  # gpt-4o лучше всего работает с картинками
+                model="gpt-4o-mini",  
                 messages=messages,
                 temperature=0.7,
                 max_tokens=1000
