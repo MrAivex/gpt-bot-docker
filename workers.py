@@ -46,7 +46,7 @@ class ProcessManager:
             user_data = await db.get_user(user_id)
             if not user_data:
                 # Если юзера нет в базе, создаем его (автоматически через твой метод)
-                user_data = await db.get_or_create_user(user_id)
+                user_data = await db.register_user(user_id)
             # Проверяем лимиты
             
             # -----------------------------------
