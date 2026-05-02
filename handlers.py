@@ -98,6 +98,7 @@ class WebhookHandler:
                 )
                 # Отправляем приветствие
                 await self.bot.send_message(us_chat_id, welcome_text)
+                await db.register_user(us_start_id)
                 return web.Response(status=200)
 
             # 1. СЛУЧАЙ: Нажата инлайн-кнопка (Callback)
