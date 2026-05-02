@@ -87,6 +87,7 @@ class WebhookHandler:
             attachments = []
 
             if update_type == 'bot_started':
+                user_info = data.get('user', {})
                 logger.info(data)
                 logger.info(f"Новый пользователь {user_id} запустил бота!")
                 welcome_text = (
