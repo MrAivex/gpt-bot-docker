@@ -88,14 +88,16 @@ class WebhookHandler:
 
             if update_type == 'bot_started':
                 user_info = data.get('user', {})
+                us_start_id = user_info.get('user_id')
+                us_chat_id = data.get('chat_id')
                 logger.info(data)
-                logger.info(f"Новый пользователь {user_id} запустил бота!")
+                logger.info(f"Новый пользователь {us_start_id} запустил бота!")
                 welcome_text = (
                     "👋 **Добро пожаловать в ИИ-ассистент!**\n\n"
                     "Я могу ответить на ваши вопросы, написать код или просто пообщаться."
                 )
                 # Отправляем приветствие
-                await self.bot.send_message(chat_id, welcome_text)
+                await self.bot.send_message(us_chat_id, welcome_text)
                 return web.Response(status=200)
 
             # 1. СЛУЧАЙ: Нажата инлайн-кнопка (Callback)
