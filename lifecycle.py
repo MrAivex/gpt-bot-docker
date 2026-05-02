@@ -60,7 +60,7 @@ async def on_startup(app):
 
     scheduler.add_job(reset_query_limits_task, 'cron', hour=1, minute=0) # обновление лимитов
    
-    scheduler.add_job(scheduled_cleanup, 'cron', hour=1, minute=0) # Запускаем очистку каждый день в 3:00 ночи по МСК
+    scheduler.add_job(scheduled_cleanup, 'cron', hour=1, minute=30) # Запускаем очистку каждый день в 3:00 ночи по МСК
 #---------------------------------------------------------------------------------------------------
     
     # Также можно добавить один запуск сразу при старте для теста (опционально)
