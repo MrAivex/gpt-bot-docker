@@ -31,9 +31,7 @@ class MaxBot:
                         )
                         
                         if not msg_id:
-                            logger.error(f"ВНИМАНИЕ: ID не найден в ответе API: {data}")
-                        else:
-                            logger.info(f"Заглушка отправлена, получен ID: {msg_id}")   
+                            logger.error(f"ВНИМАНИЕ: ID не найден в ответе API: {data}")   
                             
                         return msg_id
                     else:

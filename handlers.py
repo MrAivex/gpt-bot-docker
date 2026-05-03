@@ -177,8 +177,8 @@ class WebhookHandler:
                     return web.Response(status=200)
                 
                 if final_cmd == "/id":
-                    await self.bot.send_message(chat_id, "Ваш ID:")
-                    await self.bot.send_message(chat_id, user_id)
+                    await self.bot.send_message(chat_id, f"Ваш user_id: {user_id}"\
+                                                         f"Ваш chat_id: {chat_id}")
                     return web.Response(status=200)
 
                 if final_cmd == "/clear":
