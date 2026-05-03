@@ -4,10 +4,10 @@ import asyncio
 from aiohttp import web
 from logger_config import logger
 from workers import worker_manager
-from config import WEBHOOK_PATH, ADMIN_ID
+from config import WEBHOOK_PATH, ADMIN_ID, ADMIN_COMMANDS
 from database import db
 from payments import create_payment_link 
-from subscriptions_config import AVAILABLE_SUBSCRIPTIONS, DEFAULT_SUBSCRIPTION
+from subscriptions_config import AVAILABLE_SUBSCRIPTIONS
 from datetime import datetime, timedelta
 
 EMAIL_REGEX = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
@@ -311,6 +311,11 @@ class WebhookHandler:
                     return web.Response(status=200)
 
 #-------АДМИНСКИЕ КОМАНДЫ---------------------------------------------------------------
+
+                if text.lower() == "/admin" and user_id in ADMIN_ID:
+                    admin_commands_list = "Список команд админа:\n"
+                    for command_name in ADMIN_COMMANDS:
+                        admin_commands_list += f"{command_name}\n"
 
                 if text.lower() == "/count" and user_id in ADMIN_ID:
                     try:
