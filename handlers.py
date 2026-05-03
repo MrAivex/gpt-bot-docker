@@ -308,7 +308,7 @@ class WebhookHandler:
 
 #-------АДМИНСКИЕ КОМАНДЫ---------------------------------------------------------------
 
-                if text.lower() == "/count" and user_id == ADMIN_ID:
+                if text.lower() == "/count" and user_id in ADMIN_ID:
                     try:
                         total_users = await db.get_total_users_count()
                         await self.bot.send_message(
@@ -323,7 +323,7 @@ class WebhookHandler:
                         return web.Response(status=200)
                     
                 #-------АДМИНСКАЯ КОМАНДА: ИНФО О ПОЛЬЗОВАТЕЛЕ-----------------------------------------
-                if text.lower().startswith("/user") and user_id == ADMIN_ID:
+                if text.lower().startswith("/user") and user_id in ADMIN_ID:
                     try:
                         # Извлекаем ID из сообщения "/user 111111"
                         parts = text.split()
@@ -365,7 +365,7 @@ class WebhookHandler:
                         await self.bot.send_message(chat_id, "Ошибка при обращении к БД.")
                         return web.Response(status=200)
 
-                if text.lower().startswith("/update") and user_id == ADMIN_ID:
+                if text.lower().startswith("/update") and user_id in ADMIN_ID:
                     try:
                         parts = text.split(maxsplit=3) # /update id поле значение
                         if len(parts) < 4:
@@ -406,7 +406,7 @@ class WebhookHandler:
                     return web.Response(status=200)
                         
                 #--------------МАКСИМАЛЬНОЕ КОЛИЧЕСТВО ЗАПРОСОВ-------------------------
-                if text.lower() == "/max_queries" and user_id == ADMIN_ID:
+                if text.lower() == "/max_queries" and user_id in ADMIN_ID:
                     top_users = await db.get_top_users_by_queries(limit=5)
                     
                     if top_users:
@@ -430,7 +430,7 @@ class WebhookHandler:
                     return web.Response(status=200)
                 
                 #---------------КОЛ-ВО ЛЮДЕЙ С ПОДПИСКОЙ-----------------------
-                if text.lower() == "/active_users" and user_id == ADMIN_ID:
+                if text.lower() == "/active_users" and user_id in ADMIN_ID:
                     # Получаем число активных подписчиков
                     count = await db.count_active_subscribers()
                     

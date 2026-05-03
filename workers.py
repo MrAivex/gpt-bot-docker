@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 from database import db
 from ai_providers import get_ai_brain
 from logger_config import logger
-from config import ADMIN_ID
 from config import ADMIN_ID, OPENAI_API_KEY # Импортируем ключ
 
 def split_message(text, limit=3900):
@@ -94,7 +93,7 @@ class ProcessManager:
 
             # 2. Лимиты из БД
             remaining_queries = user_data.get('available_queries')
-            if remaining_queries <= 0 and user_id != ADMIN_ID:
+            if remaining_queries <= 0 and user_id not in ADMIN_ID:
                 reply_markup = [{
                         "type": "inline_keyboard",
                         "payload": {

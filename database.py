@@ -113,7 +113,7 @@ class DatabaseManager:
     async def check_and_update_user(self, user_id: int):
         """Проверяет лимиты и обновляет счетчик запросов"""
         # Твой админский фильтр теперь внутри метода
-        if user_id == ADMIN_ID:
+        if user_id in ADMIN_ID:
             return # Админу ничего не списываем
 
         async with self.pool.acquire() as conn:

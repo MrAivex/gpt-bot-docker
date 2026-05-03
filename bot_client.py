@@ -30,11 +30,10 @@ class MaxBot:
                             (data.get('message') and data.get('message').get('body', {}).get('mid'))
                         )
                         
-                        if msg_id:
-                            logger.info(f"Заглушка отправлена, получен ID: {msg_id}")
-                        else:
-                            # Это поможет нам увидеть реальную структуру, если ID не найден
+                        if not msg_id:
                             logger.error(f"ВНИМАНИЕ: ID не найден в ответе API: {data}")
+                        else:
+                            logger.info(f"Заглушка отправлена, получен ID: {msg_id}")   
                             
                         return msg_id
                     else:
