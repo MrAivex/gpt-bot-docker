@@ -81,6 +81,17 @@ class DatabaseManager:
             
             # Преобразуем записи БД в список словарей
             return [dict(row) for row in rows]
+        
+    async def count_active_subscribers(self):
+        """Возвращает количество пользователей, у которых подписка не 'inactive'"""
+        async with self.pool.acquire() as conn:
+            # Используем COUNT для быстрого подсчета без загрузки самих данных
+            count = await conn.fetchval('''
+                SELECT COUNT(*) 
+                FROM users 
+                WHERE subscription_status != 'inactive'
+            ''')
+            return count if count else 0
 
     async def update_user_email(self, user_id: int, email: str):
         """Сохраняет или обновляет email пользователя"""

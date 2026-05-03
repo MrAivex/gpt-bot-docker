@@ -428,6 +428,19 @@ class WebhookHandler:
                         
                     await self.bot.send_message(chat_id, response_text)
                     return web.Response(status=200)
+                
+                #---------------КОЛ-ВО ЛЮДЕЙ С ПОДПИСКОЙ-----------------------
+                if text.lower() == "/active_users" and user_id == ADMIN_ID:
+                    # Получаем число активных подписчиков
+                    count = await db.count_active_subscribers()
+                    
+                    response_text = (
+                        "📊 **Статистика подписок**\n\n"
+                        f"✅ Количество активных платных пользователей: `{count}`"
+                    )
+                    
+                    await self.bot.send_message(chat_id, response_text)
+                    return web.Response(status=200)
 
 #--------------------------------------------------------------------------------------
                  
