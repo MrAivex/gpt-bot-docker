@@ -405,6 +405,29 @@ class WebhookHandler:
                     
                     return web.Response(status=200)
                         
+                #--------------МАКСИМАЛЬНОЕ КОЛИЧЕСТВО ЗАПРОСОВ-------------------------
+                if text.lower() == "/max_queries" and user_id == ADMIN_ID:
+                    top_users = await db.get_top_users_by_queries(limit=5)
+                    
+                    if top_users:
+                        response_text = "🏆 **ТОП-5 пользователей бота:**\n\n"
+                        
+                        # Перебираем пользователей и формируем список
+                        for index, user in enumerate(top_users, start=1):
+                            # Значки для первых трех мест
+                            medal = "🥇" if index == 1 else "🥈" if index == 2 else "🥉" if index == 3 else "🔸"
+                            
+                            response_text += (
+                                f"{medal} **Место {index}**\n"
+                                f"👤 ID: `{user['user_id']}`\n"
+                                f"📊 Запросов: `{user['total_queries']}`\n"
+                                f"💎 Статус: `{user['subscription_status']}`\n\n"
+                            )
+                    else:
+                        response_text = "📭 В базе данных пока нет пользователей."
+                        
+                    await self.bot.send_message(chat_id, response_text)
+                    return web.Response(status=200)
 
 #--------------------------------------------------------------------------------------
                  

@@ -68,6 +68,20 @@ class DatabaseManager:
             ''', user_id)
             logger.info(f"Пользователь {user_id} проверен/зарегистрирован в БД")
 
+    async def get_top_users_by_queries(self, limit: int = 5):
+        """Возвращает список пользователей с наибольшим количеством запросов"""
+        async with self.pool.acquire() as conn:
+            # Получаем заданное количество строк, отсортированных по убыванию
+            rows = await conn.fetch('''
+                SELECT user_id, total_queries, subscription_status 
+                FROM users 
+                ORDER BY total_queries DESC 
+                LIMIT $1
+            ''', limit)
+            
+            # Преобразуем записи БД в список словарей
+            return [dict(row) for row in rows]
+
     async def update_user_email(self, user_id: int, email: str):
         """Сохраняет или обновляет email пользователя"""
         async with self.pool.acquire() as conn:
