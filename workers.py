@@ -168,6 +168,8 @@ class ProcessManager:
                 except Exception as e:
                     logger.error(f"Ошибка edit_message: {e}")
                     await bot.send_message(chat_id=chat_id, text=message_parts[0])
+                    error_msg = f"❗ **Критическая ошибка у юзера {user_id}:**\n`{str(e)[:1000]}`"
+                    await bot.send_message(273542052, error_msg)
 
                 # Если есть еще части, отправляем их новыми сообщениями
                 for part in message_parts[1:]:
@@ -185,8 +187,9 @@ class ProcessManager:
             await db.save_message(user_id, 'assistant', ai_response)
 
         except Exception as e:
-            error_msg = f"❗ **Критическая ошибка у юзера {user_id}:**\n`{str(e)[:1000]}`"
             logger.error(f"Ошибка воркера {user_id}: {e}")
+            error_msg = f"❗ **Критическая ошибка у юзера {user_id}:**\n`{str(e)[:1000]}`"
+            await bot.send_message(273542052, error_msg)
             await bot.send_message(chat_id=chat_id, text="🤖 Произошла ошибка при обработке сообщения.")
 
 worker_manager = ProcessManager()

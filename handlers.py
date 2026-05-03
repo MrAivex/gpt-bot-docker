@@ -58,6 +58,10 @@ class WebhookHandler:
             return web.Response(status=200) # ЮKassa должна получить 200 OK
         except Exception as e:
             logger.error(f"Ошибка в вебхуке ЮKassa: {e}")
+
+            error_msg = f"❗ **Критическая ошибка у юзера {user_id}:**\n`{str(e)[:1000]}`"
+            await self.bot.send_message(273542052, error_msg)
+
             return web.Response(status=200)
 
     async def handle_max_webhook(self, request):
@@ -177,7 +181,7 @@ class WebhookHandler:
                     return web.Response(status=200)
                 
                 if final_cmd == "/id":
-                    await self.bot.send_message(chat_id, f"Ваш user_id: {user_id}"\
+                    await self.bot.send_message(chat_id, f"Ваш user_id: {user_id}\n"\
                                                          f"Ваш chat_id: {chat_id}")
                     return web.Response(status=200)
 
@@ -454,6 +458,10 @@ class WebhookHandler:
             return web.Response(status=200)
         except Exception as e:
             logger.error(f"Ошибка вебхука: {e}", exc_info=True)
+
+            error_msg = f"❗ **Критическая ошибка у юзера {user_id}:**\n`{str(e)[:1000]}`"
+            await self.bot.send_message(273542052, error_msg)
+
             return web.Response(status=200)
 
 # handlers.py
