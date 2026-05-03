@@ -7,6 +7,36 @@ from logger_config import logger
 from config import ADMIN_ID
 from config import ADMIN_ID, OPENAI_API_KEY # Импортируем ключ
 
+def split_message(text, limit=3900):
+    """
+    Разбивает текст на части, отдавая приоритет переносу строки (\n),
+    затем пробелу, чтобы не разрывать слова и абзацы.
+    """
+    if len(text) <= limit:
+        return [text]
+
+    chunks = []
+    while len(text) > limit:
+        # 1. Сначала ищем последний перенос строки в пределах лимита
+        split_index = text.rfind('\n', 0, limit)
+        
+        # 2. Если переноса строки нет, ищем последний пробел
+        if split_index == -1:
+            split_index = text.rfind(' ', 0, limit)
+            
+        # 3. Если и пробела нет (очень длинное слово/ссылка), режем жестко
+        if split_index == -1:
+            split_index = limit
+            
+        # Отрезаем кусок и очищаем лишние пробелы в начале/конце
+        chunks.append(text[:split_index].strip())
+        text = text[split_index:].strip()
+    
+    if text:
+        chunks.append(text)
+        
+    return chunks
+
 # Реализация ограниченного словаря
 class LimitedDict(OrderedDict):
     def __init__(self, limit=10000):
@@ -127,14 +157,28 @@ class ProcessManager:
             ai_response = await brain.get_answer(full_messages, image_url=image_url)
 
            # 7. Заменяем заглушку на реальный ответ
+            # ai_response = await brain.get_answer(full_messages, image_url=image_url)
+
+# Разрезаем длинный ответ на части
+            message_parts = split_message(ai_response, limit=3900)
+
             if stub_msg_id:
-                success = await bot.edit_message(chat_id, stub_msg_id, ai_response)
-                if not success:
-                    await bot.send_message(chat_id=chat_id, text=ai_response)
+                # Обновляем первое сообщение (заглушку)
+                try:
+                    await bot.edit_message(chat_id, stub_msg_id, message_parts[0])
+                except Exception as e:
+                    logger.error(f"Ошибка edit_message: {e}")
+                    await bot.send_message(chat_id=chat_id, text=message_parts[0])
+
+                # Если есть еще части, отправляем их новыми сообщениями
+                for part in message_parts[1:]:
+                    # Небольшая задержка гарантирует правильный порядок сообщений в чате
+                    await asyncio.sleep(0.2) 
+                    await bot.send_message(chat_id=chat_id, text=part)
             else:
-                # Если мы здесь, значит stub_msg_id был None изначально
-                logger.warning("Заглушка не была создана или ID не получен, шлю новым сообщением")
-                await bot.send_message(chat_id=chat_id, text=ai_response)
+                # Если заглушки не было, отправляем все части последовательно
+                for part in message_parts:
+                    await bot.send_message(chat_id=chat_id, text=part)
             
             # Сохраняем в историю текст пользователя (или пометку о фото)
             log_text = user_text if user_text else "[Изображение]"
