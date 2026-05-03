@@ -316,6 +316,8 @@ class WebhookHandler:
                     admin_commands_list = "Список команд админа:\n"
                     for command_name in ADMIN_COMMANDS:
                         admin_commands_list += f"{command_name}\n"
+                    await self.bot.send_message(chat_id, admin_commands_list)
+                    return web.Response(status=200)
 
                 if text.lower() == "/count" and user_id in ADMIN_ID:
                     try:
