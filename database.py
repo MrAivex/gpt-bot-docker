@@ -145,7 +145,6 @@ class DatabaseManager:
             # а само значение передаем через параметр $2 для безопасности.
             query = f"UPDATE users SET {field} = $2 WHERE user_id = $1"
             await conn.execute(query, user_id, value)
-            logger.info(f"Поле {field} обновлено для юзера {user_id} на значение {value}")
             
     async def reset_subscription_limits(self, query):
         async with self.pool.acquire() as conn:
@@ -181,7 +180,6 @@ class DatabaseManager:
     async def deactivate_expired_subscriptions(self, sub_id):
         """Сбрасывает просроченные подписки в 'inactive'"""
         async with self.pool.acquire() as conn:
-            logger.info(sub_id)
             available_requests = DEFAULT_SUBSCRIPTION[sub_id]['requests']
             # Находим всех, у кого дата окончания меньше текущей и статус не 'inactive'
             result = await conn.execute('''
@@ -227,7 +225,6 @@ class DatabaseManager:
                 "DELETE FROM chat_history WHERE user_id = $1", 
                 user_id
             )
-            logger.info(f"История пользователя {user_id} полностью очищена.")
 
     #-------АДМИНСКИЕ ЗАПРОСЫ---------------------------------------------------------------
 

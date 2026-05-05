@@ -20,9 +20,7 @@ class OpenAIProvider(AIProvider):
         )
 
     async def get_answer(self, messages: list, image_url: str = None) -> str:
-        try:
-            logger.info(f"AI Provider получил: image_url={image_url}")
-            
+        try: 
             # --- ШАГ 3: Подготовка контента для Vision ---
             if image_url and messages:
                 # Ищем последнее сообщение пользователя, чтобы прикрепить к нему фото
@@ -83,7 +81,6 @@ class G4FProvider(AIProvider):
         for provider in self.providers:
             for model in models:
                 try:
-                    logger.info(f"Пробую {provider.__name__} с моделью '{model}'")
                     response = await g4f.ChatCompletion.create_async(
                         model=model,
                         provider=provider,

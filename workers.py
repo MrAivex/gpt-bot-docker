@@ -69,8 +69,6 @@ class ProcessManager:
         Обновленный метод: принимает список вложений (attachments)
         """
         try:
-            logger.info(f"--- ЗАПУСК ЛОГИКИ ДЛЯ {user_id} ---")
-
             # --- ВОТ СЮДА ВСТАВЛЯЕМ ПРОВЕРКУ ---
             user_data = await db.get_user(user_id)
             if not user_data:
@@ -113,7 +111,6 @@ class ProcessManager:
             # 3. Извлекаем фото (если есть)
             image_url = None
             if attachments:
-                logger.info(f"Получено вложений: {len(attachments)}")
                 for att in attachments:
                     att_type = str(att.get('type', '')).lower()
                     payload = att.get('payload', {})

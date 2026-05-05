@@ -63,7 +63,6 @@ class MaxBot:
                 async with session.put(url, json=payload, headers=headers) as resp:
                     res_text = await resp.text()
                     if resp.status in [200, 201, 204]:
-                        logger.info(f"Сообщение {message_id} успешно изменено.")
                         return True
                     else:
                         # Если здесь в логах будет ошибка 400, значит API требует объект body

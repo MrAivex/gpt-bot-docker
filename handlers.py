@@ -80,7 +80,6 @@ class WebhookHandler:
 
             # Если сообщению больше 60 секунд — игнорируем
             if msg_timestamp > 0 and (current_time - msg_timestamp > 60):
-                logger.info(f"Игнорирую старое сообщение (отставание: {int(current_time - msg_timestamp)} сек)")
                 return web.Response(status=200)
 
             # Инициализируем переменные по умолчанию
@@ -115,8 +114,6 @@ class WebhookHandler:
                 recipient = msg_obj.get('recipient', {})
                 
                 chat_id = recipient.get('chat_id') or recipient.get('user_id')
-                
-                logger.info(f"Кнопка нажата: payload={callback_payload}, user={user_id}, chat={chat_id}")
 
             # 2. СЛУЧАЙ: Обычное сообщение
             elif update_type == 'message_created':
@@ -149,7 +146,6 @@ class WebhookHandler:
 
             if final_cmd:
                 if final_cmd == "/start":
-                    logger.info(f"Команда /start для {user_id}")
                     await db.register_user(user_id) # Убедись, что метод есть в database.py
                     welcome_text = "Привет, это бот ChatGPT в MAX! Я могу видеть твои картинки и работать с текстом."\
                     " Давай попробуем начать!"
