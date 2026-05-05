@@ -103,7 +103,8 @@ class ProcessManager:
                 await bot.send_message(
                     chat_id=chat_id,
                     text="❌ Лимит запросов исчерпан. \n"\
-                        "Для продолжения общения оформите подписку",
+                        "Для продолжения общения оформите подписку," \
+                        " информация о подписках доступна по команде /help",
                     reply_markup=reply_markup
                     )
                 return
