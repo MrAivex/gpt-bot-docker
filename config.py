@@ -6,7 +6,7 @@ import os
 
 #------------УНИВЕРСАЛЬНЫЕ ПЕРЕМЕННЫЕ-------------------------------------------------------------------------------
 WEBHOOK_PATH = "/max-webhook"
-ADMIN_ID = [5787551]
+ADMIN_ID = [5787551, 38065306]
 OPENAI_API_KEY = "sk-jEDV6RE5q33qb53PDf58LVt4LjA2MS8ei9rPdg1pLw2GgCyN"
 SUPPORT_LINK="https://max.ru/u/f9LHodD0cOIdennqYfdEQFtEvXCDlTkAAm3lFWmfN4GgG94KMLS2FqXsgr8"
 ADMIN_COMMANDS=["/admin", "/count", "/user", "/update", "/max_queries", "/active_users"]
