@@ -151,13 +151,6 @@ class DatabaseManager:
         async with self.pool.acquire() as conn:
             await conn.execute(query)
 
-            query_inactive = '''
-                UPDATE users 
-                SET used_queries = 0
-                WHERE subscription_type = 'inactive' 
-                   OR subscription_end <= CURRENT_TIMESTAMP;
-            '''
-            await conn.execute(query_inactive)
             logger.info("Лимиты подписчиков динамически обновлены на основе конфига.")
 
     async def save_message(self, user_id: int, role: str, content: str):

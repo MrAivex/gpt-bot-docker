@@ -42,8 +42,8 @@ def create_reset_limits_text(sub_list):
     # Мы перебираем все подписки из словаря AVAILABLE_SUBSCRIPTIONS
     case_parts = []
     for sub_id, info in sub_list.items():
-        # Добавляем строку вида: WHEN subscription_type = 'sub_5' THEN 5
-        case_parts.append(f"WHEN subscription_type = '{sub_id}' THEN {info['requests']}")
+        # Добавляем строку вида: WHEN subscription_status = 'sub_5' THEN 5
+        case_parts.append(f"WHEN subscription_status = '{sub_id}' THEN {info['requests']}")
     
     # Соединяем все части в одну строку
     case_statement = "\n                ".join(case_parts)
@@ -57,7 +57,7 @@ def create_reset_limits_text(sub_list):
             END,
             used_queries = 0
         WHERE subscription_end > CURRENT_TIMESTAMP 
-          AND subscription_type != 'inactive'
+          AND subscription_status != 'inactive'
     '''
     return query
 
