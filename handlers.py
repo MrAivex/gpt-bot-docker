@@ -192,7 +192,9 @@ class WebhookHandler:
 
                 if final_cmd == "/ref":
                     link = f"{REF_URL}?start={user_id}"
-                    await self.bot.send_message(chat_id, "🔗 Твоя ссылка для приглашений:"\
+                    await self.bot.send_message(chat_id, "❗❗Прежде чем отправить другу ссылку, обязательно "\
+                                    "выполни команду /start , иначе не узнаешь, когда придет вознаграждение!!"
+                                    "🔗 Твоя ссылка для приглашений:"\
                                     f"\n`{link}`\n\nЗа каждого друга даем 3 бесплатных запроса!")
                     return web.Response(status=200)
 
@@ -311,7 +313,7 @@ class WebhookHandler:
                     user_data = await db.get_user(user_id)
                     
                     if user_data is None:
-                        await db.register_user(user_id)
+                        await db.register_user_with_referrer(user_id, chat_id)
                         # 2. Используем chat_id вместо user_id для отправки
                         await self.bot.send_message(chat_id, "Вам доступен пробный период\n\n"
                             "Приобрести подписку можно по команде /help")
