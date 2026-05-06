@@ -72,8 +72,9 @@ class ProcessManager:
             # --- ВОТ СЮДА ВСТАВЛЯЕМ ПРОВЕРКУ ---
             user_data = await db.get_user(user_id)
             if not user_data:
-                # Если юзера нет в базе, создаем его (автоматически через твой метод)
-                user_data = await db.register_user(user_id)
+                # Если юзера нет в баз е, создаем его (автоматически через твой метод)
+                await db.register_user_with_referrer(user_id, chat_id)
+                user_data = await db.get_user(user_id)
             # Проверяем лимиты
             
             # -----------------------------------
@@ -103,8 +104,9 @@ class ProcessManager:
                 await bot.send_message(
                     chat_id=chat_id,
                     text="❌ Лимит запросов исчерпан. \n"\
-                        "Для продолжения общения оформите подписку," \
-                        " информация о подписках доступна по команде /help",
+                        "Для продолжения общения оформите подписку или пригласите друга," \
+                        " информация о подписках доступна по команде /help\n"\
+                        "Пригласить друга можно по команде /ref",
                     reply_markup=reply_markup
                     )
                 return

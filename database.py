@@ -2,6 +2,7 @@ import asyncpg
 from logger_config import logger
 from config import DB_DSN, ADMIN_ID
 from subscriptions_config import DEFAULT_SUBSCRIPTION
+import db_utils
 
 class DatabaseManager:
     def __init__(self):
@@ -54,6 +55,11 @@ class DatabaseManager:
         except Exception as e:
             logger.error(f"Ошибка подключения к БД: {e}")
             raise
+
+#---------------МЕТОДЫ ИЗ DB_UTILS.PY--------------------------------------------
+    async def get_all_active_chat_ids(self):
+            return await db_utils.fetch_active_chats(self.pool)
+#--------------------------------------------------------------------------------
 
     async def disconnect(self):
         """Закрываем пул при выключении бота"""
@@ -126,7 +132,7 @@ class DatabaseManager:
             UPDATE users 
             SET used_queries = used_queries + 1, 
                 total_queries = total_queries + 1,
-                last_active = CURRENT_TIMESTAMP
+                last_active = CURRENT_TIMESTAMP,
                 chat_id = $2
             WHERE user_id = $1
         ''', user_id, chat_id)
@@ -170,6 +176,11 @@ class DatabaseManager:
         async with self.pool.acquire() as conn:
             # Проверяем, существует ли уже пользователь
             user = await conn.fetchrow('SELECT * FROM users WHERE user_id = $1', user_id)
+            await conn.execute('''
+                UPDATE users 
+                SET chat_id = $1 
+                WHERE user_id = $2 
+                               ''', chat_id, user_id)
             if not user:
                 # Если реферер указан, проверяем, что это не сам пользователь
                 if referrer_id == user_id:
@@ -177,7 +188,9 @@ class DatabaseManager:
                     
                 await conn.execute('''
                     INSERT INTO users (user_id, referrer_id, available_queries, subscription_status, chat_id)
-                    VALUES ($1, $2, 10, 'inactive', $3)
+                        VALUES ($1, $2, 10, 'inactive', $3)
+                        ON CONFLICT (user_id) 
+                        DO UPDATE SET chat_id = EXCLUDED.chat_id;
                 ''', user_id, referrer_id, chat_id)
                 return True
             return False
@@ -238,7 +251,6 @@ class DatabaseManager:
             ''', str(sub_id), int(available_requests))
             return result
 
-    # В database.py
     async def get_recent_history(self, user_id: int, limit: int = 10):
         """Получает историю в правильном порядке: от старых к новым"""
         async with self.pool.acquire() as conn:

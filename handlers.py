@@ -4,11 +4,12 @@ import asyncio
 from aiohttp import web
 from logger_config import logger
 from workers import worker_manager
-from config import WEBHOOK_PATH, ADMIN_ID, ADMIN_COMMANDS
+from config import WEBHOOK_PATH, ADMIN_ID, ADMIN_COMMANDS, REF_URL, ADMIN_CHAT_ID
 from database import db
 from payments import create_payment_link 
 from subscriptions_config import AVAILABLE_SUBSCRIPTIONS
 from datetime import datetime, timedelta
+from handlers_utils import HandlersUtils as h_utils
 
 EMAIL_REGEX = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
 
@@ -99,19 +100,21 @@ class WebhookHandler:
                     "Я могу ответить на ваши вопросы, написать код или просто пообщаться."
                 )
                 referrer_id_str = data.get('payload') # Извлекаем данные из диплинка
-
-                ref_obj = db.get_user(referrer_id_str)
-                ref_chat_id = ref_obj.get('chat_id')
     
                 if referrer_id_str and referrer_id_str.isdigit():
                     referrer_id = int(referrer_id_str)
-                    if referrer_id != us_start_id:
+                    ref_obj = await db.get_user(referrer_id)
+                    ref_chat_id = ref_obj.get('chat_id')
+                    if referrer_id != us_start_id and ref_chat_id:
                         # Логика регистрации через рефералку
-                        await db.register_user_with_referrer(user_id, chat_id, referrer_id)
-                        await db.add_referral_bonus(referrer_id, 3)
-                        if ref_chat_id:
+                        is_new = await db.register_user_with_referrer(us_start_id, us_chat_id, referrer_id)
+                        if is_new:
+                            await db.add_referral_bonus(referrer_id, 3)
                             await self.bot.send_message(ref_chat_id, "🎁 Вам начислено 3 запроса за приглашение друга!")
-                        await self.bot.send_message(us_chat_id, welcome_text)
+                        await self.bot.send_message(us_chat_id, f"👋 {welcome_text}")
+                        return web.Response(status=200)
+                await db.register_user_with_referrer(us_start_id, us_chat_id)
+                await self.bot.send_message(us_chat_id, welcome_text)
                 return web.Response(status=200)
 
             # 1. СЛУЧАЙ: Нажата инлайн-кнопка (Callback)
@@ -188,7 +191,7 @@ class WebhookHandler:
                 #     return web.Response(status=200)
 
                 if final_cmd == "/ref":
-                    link = f"https://max.ru/id973302994385_bot?start={user_id}"
+                    link = f"{REF_URL}?start={user_id}"
                     await self.bot.send_message(chat_id, "🔗 Твоя ссылка для приглашений:"\
                                     f"\n`{link}`\n\nЗа каждого друга даем 3 бесплатных запроса!")
                     return web.Response(status=200)
@@ -211,6 +214,9 @@ class WebhookHandler:
                             [
                                 {"type": "callback", "text": "Поддержка", "payload": "support"},
                                 {"type": "callback", "text": "Мои запросы", "payload": "my_queries"}
+                            ],
+                            [
+                                {"type": "callback", "text": "Пригласить друга", "payload": "/ref"}
                             ]
                             ]
                         }
@@ -371,8 +377,7 @@ class WebhookHandler:
                         await self.bot.send_message(chat_id, "Ошибка при обращении к базе данных.")
                         return web.Response(status=200)
                     
-                #-------АДМИНСКАЯ КОМАНДА: ИНФО О ПОЛЬЗОВАТЕЛЕ-----------------------------------------
-                if text.lower().startswith("/user") and user_id in ADMIN_ID:
+                if text.lower().startswith("/user") and user_id in ADMIN_ID: # Информация о пользователе
                     try:
                         # Извлекаем ID из сообщения "/user 111111"
                         parts = text.split()
@@ -386,7 +391,6 @@ class WebhookHandler:
                         if not user_info:
                             await self.bot.send_message(chat_id, f"❌ Пользователь с ID `{target_id}` не найден.")
                         else:
-                            # Формируем красивый отчет
                             status = user_info.get('subscription_status', 'inactive')
                             queries_left = user_info.get('available_queries', 0)
                             total = user_info.get('total_queries', 0)
@@ -394,6 +398,7 @@ class WebhookHandler:
                             sub_end_str = sub_end.strftime('%d.%m.%Y %H:%M') if sub_end else "Нет"
                             email = user_info.get('user_email') or "Не указан"
                             user_chat_id = user_info.get('chat_id') or "Не указан"
+                            us_referer_id = user_info.get('referrer_id') or "Не указан"
 
                             report = (
                                 f"👤 **Данные пользователя {target_id}:**\n\n"
@@ -403,7 +408,8 @@ class WebhookHandler:
                                 f"🔹 Всего запросов: `{total}`\n"
                                 f"🔹 Подписка до: `{sub_end_str}`\n"
                                 f"🔹 Последняя активность: `{user_info.get('last_active').strftime('%d.%m.%Y %H:%M')}`\n"
-                                f"🔹 Подписка до: `{user_chat_id}`"
+                                f"🔹 chat_id: `{user_chat_id}`\n"
+                                f"🔹 referrer_id: `{us_referer_id}`"
                             )
                             await self.bot.send_message(chat_id, report)
 
@@ -428,7 +434,6 @@ class WebhookHandler:
                         raw_value = parts[3]
                         final_value = raw_value
 
-                        # --- ЛОГИКА ПРИВЕДЕНИЯ ТИПОВ ---
                         int_fields = ['used_queries', 'available_queries', 'total_queries']
                         date_fields = ['subscription_end', 'subscription_start']
 
@@ -456,8 +461,7 @@ class WebhookHandler:
                     
                     return web.Response(status=200)
                         
-                #--------------МАКСИМАЛЬНОЕ КОЛИЧЕСТВО ЗАПРОСОВ-------------------------
-                if text.lower() == "/max_queries" and user_id in ADMIN_ID:
+                if text.lower() == "/max_queries" and user_id in ADMIN_ID: # МАКСИМАЛЬНОЕ КОЛИЧЕСТВО ЗАПРОСОВ
                     top_users = await db.get_top_users_by_queries(limit=10)
                     
                     if top_users:
@@ -480,8 +484,7 @@ class WebhookHandler:
                     await self.bot.send_message(chat_id, response_text)
                     return web.Response(status=200)
                 
-                #---------------КОЛ-ВО ЛЮДЕЙ С ПОДПИСКОЙ-----------------------
-                if text.lower() == "/active_users" and user_id in ADMIN_ID:
+                if text.lower() == "/active_users" and user_id in ADMIN_ID: # КОЛ-ВО ЛЮДЕЙ С ПОДПИСКОЙ
                     # Получаем число активных подписчиков
                     count = await db.count_active_subscribers()
                     
@@ -493,8 +496,7 @@ class WebhookHandler:
                     await self.bot.send_message(chat_id, response_text)
                     return web.Response(status=200)
                 
-                #-------------УДАЛИТЬ ПОЛЬЗОВАТЕЛЯ--------------------
-                if text.startswith("/delete ") and user_id in ADMIN_ID:
+                if text.startswith("/delete ") and user_id in ADMIN_ID: # УДАЛИТЬ ПОЛЬЗОВАТЕЛЯ
                     # Извлекаем ID из команды "/delete 12345"
                     parts = text.split(" ")
                     if len(parts) < 2 or not parts[1].isdigit():
@@ -513,7 +515,10 @@ class WebhookHandler:
                         
                     await self.bot.send_message(chat_id, response_text)
                     return web.Response(status=200)
-
+                
+                if text.lower().startswith("/send") and user_id in ADMIN_ID: # Рассылка по команде /send
+                    asyncio.create_task(h_utils.process_broadcast(self.bot, ADMIN_CHAT_ID, text))
+                    return web.Response(status=200)
 #--------------------------------------------------------------------------------------
                  
             # Если это не команда, а обычное общение с ИИ

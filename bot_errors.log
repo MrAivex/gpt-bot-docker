@@ -134,3 +134,161 @@ AttributeError: 'coroutine' object has no attribute 'get'
 2026-04-30 16:37:39,159 - gpt_bot - ERROR - Ошибка воркера 283226333: 'NoneType' object is not subscriptable
 2026-04-30 16:38:33,027 - gpt_bot - ERROR - Ошибка воркера 283226333: 'NoneType' object is not subscriptable
 2026-04-30 22:12:08,030 - gpt_bot - ERROR - Ошибка при обновлении пользователя: 'DatabaseManager' object has no attribute 'update_user_field'
+2026-05-06 11:52:12,590 - gpt_bot - ERROR - Ошибка вебхука: 'coroutine' object has no attribute 'get'
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers.py", line 104, in handle_max_webhook
+    ref_chat_id = ref_obj.get('chat_id')
+                  ^^^^^^^^^^^
+AttributeError: 'coroutine' object has no attribute 'get'
+2026-05-06 11:52:12,764 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 273542052 not found"}
+2026-05-06 11:53:54,815 - gpt_bot - ERROR - Ошибка вебхука: 'coroutine' object has no attribute 'get'
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers.py", line 104, in handle_max_webhook
+    ref_chat_id = ref_obj.get('chat_id')
+                  ^^^^^^^^^^^
+AttributeError: 'coroutine' object has no attribute 'get'
+2026-05-06 11:53:54,914 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 273542052 not found"}
+2026-05-06 11:55:20,580 - gpt_bot - ERROR - Ошибка вебхука: invalid input for query argument $1: '5787551' ('str' object cannot be interpreted as an integer)
+Traceback (most recent call last):
+  File "asyncpg/protocol/prepared_stmt.pyx", line 175, in asyncpg.protocol.protocol.PreparedStatementState._encode_bind_msg
+  File "asyncpg/protocol/codecs/base.pyx", line 251, in asyncpg.protocol.protocol.Codec.encode
+  File "asyncpg/protocol/codecs/base.pyx", line 153, in asyncpg.protocol.protocol.Codec.encode_scalar
+  File "asyncpg/pgproto/codecs/int.pyx", line 105, in asyncpg.pgproto.pgproto.int8_encode
+TypeError: 'str' object cannot be interpreted as an integer
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers.py", line 103, in handle_max_webhook
+    ref_obj = await db.get_user(referrer_id_str)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\database.py", line 113, in get_user
+    row = await conn.fetchrow('SELECT * FROM users WHERE user_id = $1', user_id)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\venv\Lib\site-packages\asyncpg\connection.py", line 752, in fetchrow
+    data = await self._execute(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\venv\Lib\site-packages\asyncpg\connection.py", line 1873, in _execute
+    result, _ = await self.__execute(
+                ^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\venv\Lib\site-packages\asyncpg\connection.py", line 1970, in __execute
+    result, stmt = await self._do_execute(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\venv\Lib\site-packages\asyncpg\connection.py", line 2033, in _do_execute
+    result = await executor(stmt, None)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "asyncpg/protocol/protocol.pyx", line 184, in bind_execute
+  File "asyncpg/protocol/prepared_stmt.pyx", line 204, in asyncpg.protocol.protocol.PreparedStatementState._encode_bind_msg
+asyncpg.exceptions.DataError: invalid input for query argument $1: '5787551' ('str' object cannot be interpreted as an integer)
+2026-05-06 11:55:20,849 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 273542052 not found"}
+2026-05-06 11:59:08,648 - gpt_bot - ERROR - Ошибка вебхука: значение NULL в столбце "user_id" отношения "users" нарушает ограничение NOT NULL
+DETAIL:  Ошибочная строка содержит (null, 0, 10, 0, 2026-05-06 11:59:08.578764, inactive, null, null, null, 5787551, null).
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers.py", line 116, in handle_max_webhook
+    await db.register_user_with_referrer(user_id, chat_id, referrer_id)
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\database.py", line 178, in register_user_with_referrer
+    await conn.execute('''
+    ...<2 lines>...
+    ''', user_id, referrer_id, chat_id)
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\venv\Lib\site-packages\asyncpg\connection.py", line 357, in execute
+    _, status, _ = await self._execute(
+                   ^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\venv\Lib\site-packages\asyncpg\connection.py", line 1873, in _execute
+    result, _ = await self.__execute(
+                ^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\venv\Lib\site-packages\asyncpg\connection.py", line 1970, in __execute
+    result, stmt = await self._do_execute(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\venv\Lib\site-packages\asyncpg\connection.py", line 2033, in _do_execute
+    result = await executor(stmt, None)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "asyncpg/protocol/protocol.pyx", line 205, in bind_execute
+asyncpg.exceptions.NotNullViolationError: значение NULL в столбце "user_id" отношения "users" нарушает ограничение NOT NULL
+DETAIL:  Ошибочная строка содержит (null, 0, 10, 0, 2026-05-06 11:59:08.578764, inactive, null, null, null, 5787551, null).
+2026-05-06 11:59:08,719 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 273542052 not found"}
+2026-05-06 12:18:41,286 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"proto.payload","message":"Failed to convert value: 'None'"}
+2026-05-06 12:41:25,053 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"proto.payload","message":"Failed to convert value: 'None'"}
+2026-05-06 12:42:38,727 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"proto.payload","message":"Failed to convert value: 'None'"}
+2026-05-06 12:43:51,165 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"proto.payload","message":"Failed to convert value: 'None'"}
+2026-05-06 12:44:43,267 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"proto.payload","message":"Failed to convert value: 'None'"}
+2026-05-06 12:46:19,765 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"proto.payload","message":"Failed to convert value: 'None'"}
+2026-05-06 13:26:02,766 - gpt_bot - ERROR - Ошибка вебхука: int() argument must be a string, a bytes-like object or a real number, not 'NoneType'
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers.py", line 103, in handle_max_webhook
+    ref_obj = await db.get_user(int(referrer_id_str))
+                                ~~~^^^^^^^^^^^^^^^^^
+TypeError: int() argument must be a string, a bytes-like object or a real number, not 'NoneType'
+2026-05-06 13:26:02,957 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 273542052 not found"}
+2026-05-06 13:46:37,838 - gpt_bot - ERROR - Ошибка вебхука: int() argument must be a string, a bytes-like object or a real number, not 'NoneType'
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers.py", line 103, in handle_max_webhook
+    ref_obj = await db.get_user(int(referrer_id_str))
+                                ~~~^^^^^^^^^^^^^^^^^
+TypeError: int() argument must be a string, a bytes-like object or a real number, not 'NoneType'
+2026-05-06 13:46:37,996 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 273542052 not found"}
+2026-05-06 14:18:53,370 - gpt_bot - ERROR - Ошибка воркера 283226333: ошибка синтаксиса (примерное положение: "chat_id")
+2026-05-06 14:18:53,476 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 273542052 not found"}
+2026-05-06 14:25:39,951 - gpt_bot - ERROR - Ошибка воркера 283226333: ошибка синтаксиса (примерное положение: "chat_id")
+2026-05-06 14:25:40,016 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 273542052 not found"}
+2026-05-06 14:30:16,264 - gpt_bot - ERROR - Ошибка воркера 283226333: ошибка синтаксиса (примерное положение: "chat_id")
+2026-05-06 14:30:16,339 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 273542052 not found"}
+2026-05-06 15:15:27,960 - gpt_bot - ERROR - Ошибка вебхука: invalid input for query argument $1: '5787551' ('str' object cannot be interpreted as an integer)
+Traceback (most recent call last):
+  File "asyncpg/protocol/prepared_stmt.pyx", line 175, in asyncpg.protocol.protocol.PreparedStatementState._encode_bind_msg
+  File "asyncpg/protocol/codecs/base.pyx", line 251, in asyncpg.protocol.protocol.Codec.encode
+  File "asyncpg/protocol/codecs/base.pyx", line 153, in asyncpg.protocol.protocol.Codec.encode_scalar
+  File "asyncpg/pgproto/codecs/int.pyx", line 105, in asyncpg.pgproto.pgproto.int8_encode
+TypeError: 'str' object cannot be interpreted as an integer
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers.py", line 105, in handle_max_webhook
+    ref_obj = await db.get_user(referrer_id_str)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\database.py", line 113, in get_user
+    row = await conn.fetchrow('SELECT * FROM users WHERE user_id = $1', user_id)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\venv\Lib\site-packages\asyncpg\connection.py", line 752, in fetchrow
+    data = await self._execute(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\venv\Lib\site-packages\asyncpg\connection.py", line 1873, in _execute
+    result, _ = await self.__execute(
+                ^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\venv\Lib\site-packages\asyncpg\connection.py", line 1970, in __execute
+    result, stmt = await self._do_execute(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\venv\Lib\site-packages\asyncpg\connection.py", line 2033, in _do_execute
+    result = await executor(stmt, None)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "asyncpg/protocol/protocol.pyx", line 184, in bind_execute
+  File "asyncpg/protocol/prepared_stmt.pyx", line 204, in asyncpg.protocol.protocol.PreparedStatementState._encode_bind_msg
+asyncpg.exceptions.DataError: invalid input for query argument $1: '5787551' ('str' object cannot be interpreted as an integer)
+2026-05-06 15:15:28,073 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 273542052 not found"}
