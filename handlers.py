@@ -98,9 +98,20 @@ class WebhookHandler:
                     "👋 **Добро пожаловать в ИИ-ассистент!**\n\n"
                     "Я могу ответить на ваши вопросы, написать код или просто пообщаться."
                 )
-                # Отправляем приветствие
-                await self.bot.send_message(us_chat_id, welcome_text)
-                await db.register_user(us_start_id)
+                referrer_id_str = data.get('payload') # Извлекаем данные из диплинка
+
+                ref_obj = db.get_user(referrer_id_str)
+                ref_chat_id = ref_obj.get('chat_id')
+    
+                if referrer_id_str and referrer_id_str.isdigit():
+                    referrer_id = int(referrer_id_str)
+                    if referrer_id != us_start_id:
+                        # Логика регистрации через рефералку
+                        await db.register_user_with_referrer(user_id, chat_id, referrer_id)
+                        await db.add_referral_bonus(referrer_id, 3)
+                        if ref_chat_id:
+                            await self.bot.send_message(ref_chat_id, "🎁 Вам начислено 3 запроса за приглашение друга!")
+                        await self.bot.send_message(us_chat_id, welcome_text)
                 return web.Response(status=200)
 
             # 1. СЛУЧАЙ: Нажата инлайн-кнопка (Callback)
@@ -145,15 +156,46 @@ class WebhookHandler:
             final_cmd = (text or callback_payload or "").strip().lower()
 
             if final_cmd:
-                if final_cmd == "/start":
-                    await db.register_user(user_id) # Убедись, что метод есть в database.py
-                    welcome_text = "Привет, это бот ChatGPT в MAX! Я могу видеть твои картинки и работать с текстом."\
-                    " Давай попробуем начать!"
-                    await self.bot.send_message(chat_id, welcome_text)
+                if text.startswith("/start"):
+                    parts = text.split(" ")
+                    referrer_id = None
+                    
+                    # Если в ссылке есть ID (например, /start 5333223)
+                    if len(parts) > 1 and parts[1].isdigit():
+                        referrer_id = int(parts[1])
+
+                    # Пытаемся зарегистрировать новичка
+                    is_new = await db.register_user_with_referrer(user_id, chat_id, referrer_id)
+                    
+                    if is_new and referrer_id:
+                        # Начисляем бонус пригласившему
+                        await db.add_referral_bonus(referrer_id, 3)
+                        # Уведомляем пригласившего (опционально)
+                        try:
+                            await self.bot.send_message(referrer_id, "🎁 Вам начислено 3 запроса за приглашение друга!")
+                        except:
+                            pass
+
+                    await self.bot.send_message(chat_id, "Привет! Я твой ИИ ассистент, можешь задать мне любой вопрос!"\
+                                                        "\n\nМеню доступно по команде /help")
+                    return web.Response(status=200)
+
+                # if final_cmd == "/start":
+                #     await db.register_user(user_id)
+                #     welcome_text = "Привет, это бот ChatGPT в MAX! Я могу видеть твои картинки и работать с текстом."\
+                #     " Давай попробуем начать!"
+                #     await self.bot.send_message(chat_id, welcome_text)
+                #     return web.Response(status=200)
+
+                if final_cmd == "/ref":
+                    link = f"https://max.ru/id973302994385_bot?start={user_id}"
+                    await self.bot.send_message(chat_id, "🔗 Твоя ссылка для приглашений:"\
+                                    f"\n`{link}`\n\nЗа каждого друга даем 3 бесплатных запроса!")
                     return web.Response(status=200)
 
                 if final_cmd == "/help":
-                    help_text = "📖 *Доступные команды:*\n/start\n/help"
+                    help_text = "📖 *Доступные команды:*\n/start\n/help\n"\
+                    "/ref - пригласить друга"
                     # Формат клавиатуры из твоего предыдущего сообщения
                     reply_markup = [{
                         "type": "inline_keyboard",
@@ -351,6 +393,7 @@ class WebhookHandler:
                             sub_end = user_info.get('subscription_end')
                             sub_end_str = sub_end.strftime('%d.%m.%Y %H:%M') if sub_end else "Нет"
                             email = user_info.get('user_email') or "Не указан"
+                            user_chat_id = user_info.get('chat_id') or "Не указан"
 
                             report = (
                                 f"👤 **Данные пользователя {target_id}:**\n\n"
@@ -359,7 +402,8 @@ class WebhookHandler:
                                 f"🔹 Осталось лимитов: `{queries_left}`\n"
                                 f"🔹 Всего запросов: `{total}`\n"
                                 f"🔹 Подписка до: `{sub_end_str}`\n"
-                                f"🔹 Последняя активность: `{user_info.get('last_active').strftime('%d.%m.%Y %H:%M')}`"
+                                f"🔹 Последняя активность: `{user_info.get('last_active').strftime('%d.%m.%Y %H:%M')}`\n"
+                                f"🔹 Подписка до: `{user_chat_id}`"
                             )
                             await self.bot.send_message(chat_id, report)
 
@@ -414,7 +458,7 @@ class WebhookHandler:
                         
                 #--------------МАКСИМАЛЬНОЕ КОЛИЧЕСТВО ЗАПРОСОВ-------------------------
                 if text.lower() == "/max_queries" and user_id in ADMIN_ID:
-                    top_users = await db.get_top_users_by_queries(limit=5)
+                    top_users = await db.get_top_users_by_queries(limit=10)
                     
                     if top_users:
                         response_text = "🏆 **ТОП-5 пользователей бота:**\n\n"
@@ -446,6 +490,27 @@ class WebhookHandler:
                         f"✅ Количество активных платных пользователей: `{count}`"
                     )
                     
+                    await self.bot.send_message(chat_id, response_text)
+                    return web.Response(status=200)
+                
+                #-------------УДАЛИТЬ ПОЛЬЗОВАТЕЛЯ--------------------
+                if text.startswith("/delete ") and user_id in ADMIN_ID:
+                    # Извлекаем ID из команды "/delete 12345"
+                    parts = text.split(" ")
+                    if len(parts) < 2 or not parts[1].isdigit():
+                        await self.bot.send_message(chat_id, "⚠️ Формат команды: `/delete {user_id}`")
+                        return web.Response(status=200)
+
+                    target_id = int(parts[1])
+                    
+                    # Пытаемся удалить
+                    success = await db.delete_user(target_id)
+                    
+                    if success:
+                        response_text = f"✅ Пользователь `{target_id}` успешно удален из базы данных."
+                    else:
+                        response_text = f"❌ Пользователь `{target_id}` не найден в базе."
+                        
                     await self.bot.send_message(chat_id, response_text)
                     return web.Response(status=200)
 

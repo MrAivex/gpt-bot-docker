@@ -147,7 +147,7 @@ class ProcessManager:
             stub_msg_id = await bot.send_message(chat_id=chat_id, text=stub_text)
 
 #-----------------Обновление лимитов-------------------------------------------
-            await db.check_and_update_user(user_id)
+            await db.check_and_update_user(user_id, chat_id)
 #-----------------------------------------------------------------------------
 
             # 5. Запрос к ИИ (передаем URL картинки, если он есть)

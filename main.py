@@ -1,4 +1,4 @@
-from aiohttp import web # lt --port 8080 --subdomain my-super-gpt-bot
+from aiohttp import web # lt --port 8080 --subdomain empty-snail-52
 from config import TOKEN # function qw { .\venv\Scripts\activate; python main.py }
 from handlers import setup_handlers
 from bot_client import MaxBot

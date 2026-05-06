@@ -23,13 +23,17 @@ class DatabaseManager:
                         subscription_start TIMESTAMP,
                         subscription_end TIMESTAMP,
                         last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        user_email TEXT
+                        user_email TEXT,
+                        referrer_id BIGINT,
+                        chat_id BIGINT
                     );
                                    
                     -- Миграция: добавляем колонки дат, если их нет
                     ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_start TIMESTAMP;
                     ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_end TIMESTAMP;
                     ALTER TABLE users ADD COLUMN IF NOT EXISTS user_email TEXT;
+                    ALTER TABLE users ADD COLUMN IF NOT EXISTS referrer_id BIGINT;
+                    ALTER TABLE users ADD COLUMN IF NOT EXISTS chat_id BIGINT;
                     
                     -- Добавляем колонку "Подписка", если она отсутствует (для существующих БД)
                     ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_status TEXT DEFAULT 'inactive';
@@ -57,18 +61,19 @@ class DatabaseManager:
             await self.pool.close()
             logger.info("Соединение с PostgreSQL закрыто.")
 
-    async def register_user(self, user_id: int):
+    async def register_user(self, user_id: int, chat_id: int):
         """Регистрирует пользователя, если его еще нет в базе"""
         async with self.pool.acquire() as conn:
             await conn.execute('''
-                INSERT INTO users (user_id, last_active)
-                VALUES ($1, CURRENT_TIMESTAMP)
+                INSERT INTO users (user_id, last_active, chat_id)
+                VALUES ($1, CURRENT_TIMESTAMP, $2)
                 ON CONFLICT (user_id) DO UPDATE 
-                SET last_active = CURRENT_TIMESTAMP
-            ''', user_id)
+                SET last_active = CURRENT_TIMESTAMP,
+                    chat_id = $2
+            ''', user_id, chat_id)
             logger.info(f"Пользователь {user_id} проверен/зарегистрирован в БД")
 
-    async def get_top_users_by_queries(self, limit: int = 5):
+    async def get_top_users_by_queries(self, limit: int = 10):
         """Возвращает список пользователей с наибольшим количеством запросов"""
         async with self.pool.acquire() as conn:
             # Получаем заданное количество строк, отсортированных по убыванию
@@ -110,7 +115,7 @@ class DatabaseManager:
                 return dict(row) # Превращаем запись в обычный словарь
             return None
 
-    async def check_and_update_user(self, user_id: int):
+    async def check_and_update_user(self, user_id: int, chat_id: int):
         """Проверяет лимиты и обновляет счетчик запросов"""
         # Твой админский фильтр теперь внутри метода
         if user_id in ADMIN_ID:
@@ -121,11 +126,10 @@ class DatabaseManager:
             UPDATE users 
             SET used_queries = used_queries + 1, 
                 total_queries = total_queries + 1,
-                -- Оставляем GREATEST, чтобы лимит просто замер на 0
-                available_queries = GREATEST(0, available_queries - 1),
                 last_active = CURRENT_TIMESTAMP
+                chat_id = $2
             WHERE user_id = $1
-        ''', user_id)
+        ''', user_id, chat_id)
             
     # database.py
 
@@ -159,6 +163,44 @@ class DatabaseManager:
                 "INSERT INTO chat_history (user_id, role, content) VALUES ($1, $2, $3)",
                 user_id, role, content
             )
+
+#-----------------РЕФЕРАЛКА--------------------------------------------------------
+    async def register_user_with_referrer(self, user_id: int, chat_id: int, referrer_id: int = None):
+        """Регистрирует пользователя и связывает его с реферером"""
+        async with self.pool.acquire() as conn:
+            # Проверяем, существует ли уже пользователь
+            user = await conn.fetchrow('SELECT * FROM users WHERE user_id = $1', user_id)
+            if not user:
+                # Если реферер указан, проверяем, что это не сам пользователь
+                if referrer_id == user_id:
+                    referrer_id = None
+                    
+                await conn.execute('''
+                    INSERT INTO users (user_id, referrer_id, available_queries, subscription_status, chat_id)
+                    VALUES ($1, $2, 10, 'inactive', $3)
+                ''', user_id, referrer_id, chat_id)
+                return True
+            return False
+        
+    async def add_referral_bonus(self, referrer_id: int, bonus_queries: int = 3):
+        """Начисляет бонусные запросы пригласившему"""
+        async with self.pool.acquire() as conn:
+            await conn.execute('''
+                UPDATE users 
+                SET available_queries = available_queries + $1 
+                WHERE user_id = $2
+            ''', bonus_queries, referrer_id)
+#-------------------------------------------------------------------------------------
+
+    async def delete_user(self, user_id: int):
+        """Полностью удаляет пользователя и все связанные с ним данные из БД"""
+        async with self.pool.acquire() as conn:
+            # Удаляем пользователя. Если есть внешние ключи с ON DELETE CASCADE, 
+            # история сообщений удалится автоматически.
+            result = await conn.execute('DELETE FROM users WHERE user_id = $1', user_id)
+            
+            # Возвращаем True, если строка была удалена, и False, если юзер не найден
+            return result == 'DELETE 1'
 
     async def update_user_subscription(self, user_id, sub_id, duration_days):
         """Активирует подписку пользователю"""
