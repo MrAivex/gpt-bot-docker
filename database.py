@@ -57,8 +57,14 @@ class DatabaseManager:
             raise
 
 #---------------МЕТОДЫ ИЗ DB_UTILS.PY--------------------------------------------
-    async def get_all_active_chat_ids(self):
+    async def get_all_active_chat_ids(self): # получаем список chat_id для рассылки
             return await db_utils.fetch_active_chats(self.pool)
+    
+    async def get_referral_users_count(self): # Получаем количество приглашенных пользователей
+        return await db_utils.fetch_referral_users_count(self.pool)
+    
+    async def get_active_chats_count(self): # Получаем количество пользователей у которых есть chat_id
+        return await db_utils.fetch_chat_ids_count(self.pool) 
 #--------------------------------------------------------------------------------
 
     async def disconnect(self):

@@ -517,9 +517,17 @@ class WebhookHandler:
                         
                     await self.bot.send_message(chat_id, response_text)
                     return web.Response(status=200)
-                
+#---------------------АДМИНСКИЕ КОМАНДЫ ИЗ handlers_utils.py--------------------------------------------
                 if text.lower().startswith("/send") and user_id in ADMIN_ID: # Рассылка по команде /send
-                    asyncio.create_task(h_utils.process_broadcast(self.bot, ADMIN_CHAT_ID, text))
+                    asyncio.create_task(h_utils.process_broadcast(self.bot, chat_id, text))
+                    return web.Response(status=200)
+                
+                if text.lower() == "/refered_users" and user_id in ADMIN_ID:
+                    await h_utils.get_referral_stats(self.bot, chat_id)
+                    return web.Response(status=200)
+                
+                if text.lower() == "/chat_ids" and user_id in ADMIN_ID:
+                    await h_utils.get_chats_stats(self.bot, chat_id)
                     return web.Response(status=200)
 #--------------------------------------------------------------------------------------
                  

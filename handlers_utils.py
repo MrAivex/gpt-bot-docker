@@ -34,3 +34,35 @@ class HandlersUtils:
             f"❌ Ошибок: `{error_count}`"
         )
         await bot.send_message(admin_chat_id, report)
+
+    @staticmethod
+    async def get_referral_stats(bot, admin_chat_id):
+        try:
+            count = await db.get_referral_users_count()
+            message = (
+                "📈 **Статистика по рефералам**\n\n"
+                f"Всего пользователей, пришедших по ссылкам: `{count}`"
+            )
+            await bot.send_message(admin_chat_id, message)
+
+        except Exception as e:
+            logger.error(f"Ошибка команды /refered_users: {e}")
+            await bot.send_message(admin_chat_id, "❌ Не удалось получить статистику.")
+
+    @staticmethod
+    async def get_chats_stats(bot, admin_chat_id):
+        """
+        Получает статистику доступных для рассылки чатов.
+        """
+        try:
+            count = await db.get_active_chats_count()
+            
+            message = (
+                "📱 **Статистика по охвату**\n\n"
+                f"Пользователей с активным `chat_id`: `{count}`\n"
+                f"_(Этим людям можно отправить рассылку)_"
+            )
+            await bot.send_message(admin_chat_id, message)
+        except Exception as e:
+            logger.error(f"Ошибка команды /chat_ids: {e}")
+            await bot.send_message(admin_chat_id, "❌ Ошибка при получении данных о чатах.")
