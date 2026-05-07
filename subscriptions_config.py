@@ -28,25 +28,25 @@ AVAILABLE_SUBSCRIPTIONS = {
         "duration_days": 7
     },
     "sub_10": {
-        "name": "10 запросов в день на месяц",
+        "name": "10 запросов/день на месяц",
         "price": 79,
         "requests": 10,
         "duration_days": 31
     },
     "sub_20": {
-        "name": "20 запросов в день на месяц",
+        "name": "20 запросов/день на месяц",
         "price": 159,
         "requests": 20,
         "duration_days": 31
     },
     "sub_40": {
-        "name": "40 запросов в день на месяц",
+        "name": "40 запросов/день на месяц",
         "price": 309,
         "requests": 40,
         "duration_days": 31
     },
     "sub_100": {
-        "name": "100 запросов в день на месяц",
+        "name": "100 запросов/день на месяц",
         "price": 779,
         "requests": 100,
         "duration_days": 31

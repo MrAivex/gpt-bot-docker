@@ -255,7 +255,7 @@ class WebhookHandler:
                         buttons_rows.append([
                             {
                                 "type": "callback", 
-                                "text": f"{info['requests']} запросов/день, {info['price']} руб.", 
+                                "text": f"{info['name']}, {info['price']} руб", 
                                 "payload": f"buy_{sub_id}"
                             }
                         ])
