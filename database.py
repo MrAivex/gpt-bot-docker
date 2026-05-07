@@ -138,6 +138,7 @@ class DatabaseManager:
             UPDATE users 
             SET used_queries = used_queries + 1, 
                 total_queries = total_queries + 1,
+                available_queries = GREATEST(0, available_queries - 1)
                 last_active = CURRENT_TIMESTAMP,
                 chat_id = $2
             WHERE user_id = $1

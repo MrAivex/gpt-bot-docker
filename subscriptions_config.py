@@ -9,6 +9,24 @@ DEFAULT_SUBSCRIPTION = {
 }
 
 AVAILABLE_SUBSCRIPTIONS = {
+    "sub_unlim_1d": {
+        "name": "Безлимит на день",
+        "price": 39,
+        "requests": 10000,
+        "duration_days": 1
+    },
+    "sub_unlim_3d": {
+        "name": "Безлимит на 3 дня",
+        "price": 99,
+        "requests": 30000,
+        "duration_days": 3
+    },
+    "sub_unlim_7d": {
+        "name": "Безлимит на неделю",
+        "price": 189,
+        "requests": 70000,
+        "duration_days": 7
+    },
     "sub_10": {
         "name": "10 запросов в день на месяц",
         "price": 79,
