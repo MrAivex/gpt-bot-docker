@@ -2,14 +2,14 @@ import time
 import re
 import asyncio
 from aiohttp import web
-from logger_config import logger
-from workers import worker_manager
-from config import WEBHOOK_PATH, ADMIN_ID, ADMIN_COMMANDS, REF_URL, ADMIN_CHAT_ID
-from database import db
-from payments import create_payment_link 
-from subscriptions_config import AVAILABLE_SUBSCRIPTIONS
+from config.config_logger import logger
+from ai_services.workers import worker_manager
+from config.config_main import WEBHOOK_PATH, ADMIN_ID, ADMIN_COMMANDS, REF_URL, ADMIN_CHAT_ID
+from database.db_main import db
+from payments.payments_main import create_payment_link 
+from config.config_subscriptions import AVAILABLE_SUBSCRIPTIONS
 from datetime import datetime, timedelta
-from handlers_utils import HandlersUtils as h_utils
+from handlers.handlers_utils import HandlersUtils as h_utils
 
 EMAIL_REGEX = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
 
@@ -38,7 +38,7 @@ class WebhookHandler:
                 
                 if user_id and sub_id:
                     # 1. Получаем данные о подписке из конфига
-                    from subscriptions_config import AVAILABLE_SUBSCRIPTIONS
+                    from config.config_subscriptions import AVAILABLE_SUBSCRIPTIONS
                     sub_info = AVAILABLE_SUBSCRIPTIONS.get(sub_id, {})
                     duration = sub_info.get('duration_days', 31) # 30 дней по умолчанию
                     

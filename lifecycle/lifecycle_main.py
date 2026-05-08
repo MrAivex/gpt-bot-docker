@@ -1,9 +1,9 @@
 import aiohttp
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from database import db
-from logger_config import logger
-from config import TOKEN, WEBHOOK_URL
-from subscriptions_config import RESET_LIMITS_TEXT
+from database.db_main import db
+from config.config_logger import logger
+from config.config_main import TOKEN, WEBHOOK_URL
+from config.config_subscriptions import RESET_LIMITS_TEXT
 
 # Инициализируем планировщик
 scheduler = AsyncIOScheduler()

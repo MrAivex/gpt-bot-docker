@@ -1,8 +1,8 @@
 import uuid
 from yookassa import Configuration, Payment
-from config import SHOP_ID, PAYMENT_TOKEN, RETURN_URL
-from subscriptions_config import AVAILABLE_SUBSCRIPTIONS
-from logger_config import logger
+from config.config_main import SHOP_ID, PAYMENT_TOKEN, RETURN_URL
+from config.config_subscriptions import AVAILABLE_SUBSCRIPTIONS
+from config.config_logger import logger
 
 # Настройка ЮKassa
 Configuration.configure(SHOP_ID, PAYMENT_TOKEN)

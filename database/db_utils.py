@@ -1,4 +1,4 @@
-from logger_config import logger
+from config.config_logger import logger
 
 
 async def fetch_active_chats(pool): # Собираем chat_id у тех, у кого они есть

@@ -1,8 +1,8 @@
 from aiohttp import web # lt --port 8080 --subdomain empty-snail-52
-from config import TOKEN # function qw { .\venv\Scripts\activate; python main.py }
-from handlers import setup_handlers
+from config.config_main import TOKEN # function qw { .\venv\Scripts\activate; python main.py }
+from handlers.handlers_main import setup_handlers
 from bot_client import MaxBot
-from lifecycle import on_startup, on_cleanup
+from lifecycle.lifecycle_main import on_startup, on_cleanup
 
 # Инициализируем бота из нового файла
 bot = MaxBot(TOKEN)

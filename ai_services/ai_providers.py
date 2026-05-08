@@ -2,7 +2,7 @@ import g4f
 import httpx
 from openai import AsyncOpenAI
 from abc import ABC, abstractmethod
-from logger_config import logger
+from config.config_logger import logger
 
 class AIProvider(ABC):
     @abstractmethod

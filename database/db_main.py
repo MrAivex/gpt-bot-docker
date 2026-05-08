@@ -1,7 +1,7 @@
 import asyncpg
-from logger_config import logger
-from config import DB_DSN, ADMIN_ID
-from subscriptions_config import DEFAULT_SUBSCRIPTION
+from config.config_logger import logger
+from config.config_main import DB_DSN, ADMIN_ID
+from config.config_subscriptions import DEFAULT_SUBSCRIPTION
 import db_utils
 
 class DatabaseManager:

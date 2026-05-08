@@ -1,6 +1,6 @@
 import asyncio
-from logger_config import logger
-from database import db
+from config.config_logger import logger
+from database.db_main import db
 
 class HandlersUtils:
     @staticmethod

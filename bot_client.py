@@ -1,5 +1,5 @@
 import aiohttp
-from logger_config import logger
+from config.config_logger import logger
 
 class MaxBot:
     def __init__(self, token):

@@ -1,10 +1,10 @@
 import asyncio
 from collections import OrderedDict
 from datetime import datetime, timedelta
-from database import db
-from ai_providers import get_ai_brain
-from logger_config import logger
-from config import ADMIN_ID, OPENAI_API_KEY # Импортируем ключ
+from database.db_main import db
+from ai_services.ai_providers import get_ai_brain
+from config.config_logger import logger
+from config.config_main import ADMIN_ID, OPENAI_API_KEY # Импортируем ключ
 
 def split_message(text, limit=3900):
     """
