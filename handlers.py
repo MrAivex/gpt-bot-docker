@@ -26,7 +26,10 @@ class WebhookHandler:
             if data.get('event') == 'payment.succeeded':
                 payment_obj = data.get('object', {})
                 metadata = payment_obj.get('metadata', {})
-                
+                payment_method = payment_obj.get('payment_method', {})
+                if payment_method.get('saved'):
+                    token = payment_method.get('id')
+                    await db.update_user_field(user_id, 'payment_token', token)
                 
                 user_id = metadata.get('user_id')
                 chat_id = metadata.get('chat_id')
@@ -244,11 +247,11 @@ class WebhookHandler:
                 
                 if final_cmd == "see_subscriptions":
                     # Формируем текст со списком всех тарифов
-                    text = "🌟 **Доступные тарифные планы:**\n\n"
+                    text = "🌟 **Доступные тарифные планы:**"
                     buttons_rows = []
 
                     for sub_id, info in AVAILABLE_SUBSCRIPTIONS.items():
-                        text += f"{info['name']} за {info['price']} руб.\n\n"
+                        # text += f"{info['name']} за {info['price']} руб.\n\n"
                         
                         # Создаем кнопку для каждой подписки. 
                         # При нажатии бот получит payload вида 'buy_sub_month'

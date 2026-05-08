@@ -25,6 +25,7 @@ class DatabaseManager:
                         subscription_end TIMESTAMP,
                         last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         user_email TEXT,
+                        payment_token TEXT,
                         referrer_id BIGINT,
                         chat_id BIGINT
                     );
@@ -35,6 +36,7 @@ class DatabaseManager:
                     ALTER TABLE users ADD COLUMN IF NOT EXISTS user_email TEXT;
                     ALTER TABLE users ADD COLUMN IF NOT EXISTS referrer_id BIGINT;
                     ALTER TABLE users ADD COLUMN IF NOT EXISTS chat_id BIGINT;
+                    ALTER TABLE users ADD COLUMN IF NOT EXISTS payment_token TEXT;
                     
                     -- Добавляем колонку "Подписка", если она отсутствует (для существующих БД)
                     ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_status TEXT DEFAULT 'inactive';
@@ -65,6 +67,9 @@ class DatabaseManager:
     
     async def get_active_chats_count(self): # Получаем количество пользователей у которых есть chat_id
         return await db_utils.fetch_chat_ids_count(self.pool) 
+    
+    async def get_users_for_renewal(self): # Список пользователей для автопродления подписки
+        return await db_utils.fetch_users_for_renewal(self.pool)
 #--------------------------------------------------------------------------------
 
     async def disconnect(self):
@@ -138,7 +143,7 @@ class DatabaseManager:
             UPDATE users 
             SET used_queries = used_queries + 1, 
                 total_queries = total_queries + 1,
-                available_queries = GREATEST(0, available_queries - 1)
+                available_queries = GREATEST(0, available_queries - 1),
                 last_active = CURRENT_TIMESTAMP,
                 chat_id = $2
             WHERE user_id = $1

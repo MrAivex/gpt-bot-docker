@@ -32,3 +32,25 @@ async def fetch_chat_ids_count(pool):
     except Exception as e:
         logger.error(f"Ошибка при подсчете chat_id: {e}")
         return 0
+    
+async def fetch_users_for_renewal(pool):
+    try:
+        async with pool.acquire() as conn:
+            rows = await conn.fetch('''
+                SELECT 
+                    user_id, 
+                    chat_id, 
+                    subscription_status, 
+                    payment_token, 
+                    user_email,  -- Добавили поле email
+                    subscription_end
+                FROM users 
+                WHERE subscription_end::date = (CURRENT_TIMESTAMP + INTERVAL '1 day')::date
+                  AND payment_token IS NOT NULL
+                  AND subscription_status != 'inactive'
+                  AND user_email IS NOT NULL -- Продление без почты невозможно (чек)
+            ''')
+            return [dict(row) for row in rows]
+    except Exception as e:
+        logger.error(f"Ошибка при поиске пользователей для продления: {e}")
+        return []
