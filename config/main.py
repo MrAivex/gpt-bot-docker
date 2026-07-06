@@ -15,22 +15,22 @@ ADMIN_COMMANDS=["/admin", "/count", "/user", "/update", "/max_queries", "/active
 EMAIL_REGEX = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
 
 #------------ЛОКАЛЬНЫЙ ЗАПУСК-------------------------------------------------------------------------------
-TOKEN = "f9LHodD0cOKpRm54dQO2ji8dNZcUtkJSpeFRWkP98hwIPZO3R9PtiSg759pxVK7jWQNNCePOp5eldQ8_MpDN"
-DB_DSN = "postgresql://postgres:NoForgot_938@localhost:5432/gpt_bot_db"
-WEBHOOK_URL=f"https://empty-snail-52.loca.lt{WEBHOOK_PATH}"
-RETURN_URL="https://max.ru/id973302994385_1_bot"
-REF_URL="https://max.ru/id973302994385_1_bot"
-ADMIN_CHAT_ID=262029866
+# TOKEN = "f9LHodD0cOKpRm54dQO2ji8dNZcUtkJSpeFRWkP98hwIPZO3R9PtiSg759pxVK7jWQNNCePOp5eldQ8_MpDN"
+# DB_DSN = "postgresql://postgres:NoForgot_938@localhost:5432/gpt_bot_db"
+# WEBHOOK_URL=f"https://empty-snail-52.loca.lt{WEBHOOK_PATH}"
+# RETURN_URL="https://max.ru/id973302994385_1_bot"
+# REF_URL="https://max.ru/id973302994385_1_bot"
+# ADMIN_CHAT_ID=262029866
 
 # Ссылка для уведомлений Юкассы: https://empty-snail-52.loca.lt/yookassa-webhook
 
 #------------ЗАПУСК НА СЕРВАКЕ------------------------------------------------------------------------------
-# TOKEN = "f9LHodD0cOJJRiHaYG-mG1_HdoxpzU-e4nyNFAv7RiLsJ6BGBunLQsdCEMlY5wco6ZBJwg4KIcOtSf_DBp8q"
-# DB_DSN = "postgresql://postgres:NoForgot_938@db:5432/gpt_bot_db"
-# WEBHOOK_URL=f"https://max-gpt-ai-helper-bot.ru{WEBHOOK_PATH}"
-# RETURN_URL="https://max.ru/id973302994385_bot"
-# REF_URL="https://max.ru/id973302994385_bot"
-# ADMIN_CHAT_ID=273542052
+TOKEN = "f9LHodD0cOJJRiHaYG-mG1_HdoxpzU-e4nyNFAv7RiLsJ6BGBunLQsdCEMlY5wco6ZBJwg4KIcOtSf_DBp8q"
+DB_DSN = "postgresql://postgres:NoForgot_938@db:5432/gpt_bot_db"
+WEBHOOK_URL=f"https://max-gpt-ai-helper-bot.ru{WEBHOOK_PATH}"
+RETURN_URL="https://max.ru/id973302994385_bot"
+REF_URL="https://max.ru/id973302994385_bot"
+ADMIN_CHAT_ID=273542052
 
 # Ссылка для уведомлений Юкассы: https://max-gpt-ai-helper-bot.ru/yookassa-webhook
 
