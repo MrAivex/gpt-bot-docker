@@ -1,5 +1,5 @@
 import aiohttp
-from config.config_logger import logger
+from config.logger import logger
 
 class MaxBot:
     def __init__(self, token):
@@ -41,7 +41,7 @@ class MaxBot:
             logger.error(f"Критическая ошибка в send_message: {e}")
             return None
 
-    async def edit_message(self, chat_id, message_id, new_text):
+    async def edit_message(self, chat_id, message_id, new_text, reply_markup=None):
         # Путь остается таким же (через параметры запроса)
         url = f"{self.base_url}/messages?chat_id={chat_id}&message_id={message_id}"
         
@@ -49,8 +49,11 @@ class MaxBot:
         # Большинство методов PUT в MAX API работают с прямой структурой тела сообщения
         payload = {
             "text": new_text,
-            "format": "markdown" # или "html", если вы используете его
+            "format": "markdown"
         }
+
+        if reply_markup:
+            payload["attachments"] = reply_markup
         
         headers = {
             "Authorization": self.token,
@@ -70,6 +73,8 @@ class MaxBot:
                         
                         # Запасной вариант, если плоская структура не подошла (некоторые версии API MAX)
                         fallback_payload = {"body": {"text": new_text}}
+                        if reply_markup:
+                            fallback_payload["body"]["attachments"] = reply_markup
                         async with session.put(url, json=fallback_payload, headers=headers) as resp2:
                             if resp2.status in [200, 201, 204]:
                                 return True
@@ -78,3 +83,74 @@ class MaxBot:
         except Exception as e:
             logger.error(f"Критическая ошибка при PUT-запросе: {e}")
             return False
+        
+    async def send_photo(self, chat_id: int, image_url: str, caption: str = None):
+        url = f"{self.base_url}/messages?chat_id={chat_id}"
+        
+        attachment = {
+            "type": "image",
+            "payload": {"url": image_url}
+        }
+        
+        payload = {
+            "attachments": [attachment],
+            "format": "markdown"
+        }
+        if caption:
+            payload["text"] = caption
+        
+        headers = {"Authorization": self.token, "Content-Type": "application/json"}
+        
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(url, json=payload, headers=headers) as resp:
+                    if resp.status in [200, 201]:
+                        data = await resp.json()
+                        msg_id = (
+                            data.get('id') or 
+                            data.get('message_id') or 
+                            (data.get('message') or {}).get('id') or
+                            (data.get('message', {}).get('body', {}) or {}).get('mid')
+                        )
+                        return msg_id
+                    else:
+                        logger.error(f"Ошибка при отправке фото: {await resp.text()}")
+                        return None
+        except Exception as e:
+            logger.error(f"Ошибка send_photo: {e}")
+            return None
+        
+    async def send_document(self, chat_id: int, file_content: str, caption: str = None):
+        """
+        Отправляет изображение через base64 (тип 'image').
+        file_content – base64-строка без префикса data:image/...;base64,
+        caption – подпись (опционально)
+        """
+        url = f"{self.base_url}/messages?chat_id={chat_id}"
+        attachment = {
+            "type": "image",
+            "payload": {
+                "content": file_content
+            }
+        }
+        payload = {
+            "attachments": [attachment],
+            "format": "markdown"
+        }
+        if caption:
+            payload["text"] = caption
+
+        headers = {"Authorization": self.token, "Content-Type": "application/json"}
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(url, json=payload, headers=headers) as resp:
+                    if resp.status in [200, 201]:
+                        data = await resp.json()
+                        return data.get('id') or data.get('message_id')
+                    else:
+                        logger.error(f"Ошибка send_document: {await resp.text()}")
+                        return None
+        except Exception as e:
+            logger.error(f"Ошибка send_document: {e}")
+            return None

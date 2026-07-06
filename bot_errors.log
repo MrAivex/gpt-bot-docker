@@ -293,3 +293,169 @@ Traceback (most recent call last):
 asyncpg.exceptions.DataError: invalid input for query argument $1: '5787551' ('str' object cannot be interpreted as an integer)
 2026-05-06 15:15:28,073 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 273542052 not found"}
 2026-05-06 21:37:00,417 - gpt_bot - ERROR - Ошибка подключения к БД: [Errno 11001] getaddrinfo failed
+2026-06-04 00:00:29,942 - gpt_bot - ERROR - Webhook error: 'UserRepository' object has no attribute 'delete_user_history'
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers\webhook.py", line 63, in handle_max_webhook
+    await self.command_handler.handle(update)
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers\command_handler.py", line 85, in handle
+    await self.user_repo.delete_user_history(user_id)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'UserRepository' object has no attribute 'delete_user_history'
+2026-06-04 00:00:30,027 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 273542052 not found"}
+2026-06-04 00:01:24,191 - gpt_bot - ERROR - Webhook error: 'UserRepository' object has no attribute 'delete_user_history'
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers\webhook.py", line 63, in handle_max_webhook
+    await self.command_handler.handle(update)
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers\command_handler.py", line 85, in handle
+    await self.user_repo.delete_user_history(user_id)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'UserRepository' object has no attribute 'delete_user_history'
+2026-06-04 00:01:24,265 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 273542052 not found"}
+2026-06-04 00:29:08,895 - gpt_bot - ERROR - Webhook error: create_payment_link() takes 4 positional arguments but 5 were given
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers\webhook.py", line 60, in handle_max_webhook
+    await self.command_handler.handle(update)
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers\command_handler.py", line 113, in handle
+    pay_url = await self.payment.create_payment(sub_id, user_id, chat_id, user_obj['user_email'])
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\services\payment_service.py", line 18, in create_payment
+    payment_url, error = await self.yookassa.create_payment(
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\core\container.py", line 58, in create_payment
+    result = await create_payment_link(sub_id, user_id, chat_id, None, email)
+                   ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: create_payment_link() takes 4 positional arguments but 5 were given
+2026-06-04 00:29:08,988 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 273542052 not found"}
+2026-06-04 00:34:49,022 - gpt_bot - ERROR - Ошибка создания платежа: Ошибка платежной системы: {'type': 'error', 'id': '019e8f69-0b7e-73fa-b62d-711f9dd95d2b', 'description': "This store can't make recurring payments. Contact the YooMoney manager to learn more", 'code': 'forbidden'}
+2026-06-11 00:29:40,659 - gpt_bot - ERROR - Ошибка edit: MaxBot.edit_message() got an unexpected keyword argument 'reply_markup'
+2026-06-12 12:51:41,975 - gpt_bot - ERROR - Webhook error: Keyboards.menu_button_new_msg() takes 0 positional arguments but 1 was given
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers\webhook.py", line 82, in handle_max_webhook
+    await self.callback_handler.handle(update)
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers\callback_handler.py", line 39, in handle
+    await self.bot.send_message(chat_id, self.msg.HISTORY_CLEARED, reply_markup=self.kb.menu_button_new_msg())
+                                                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+TypeError: Keyboards.menu_button_new_msg() takes 0 positional arguments but 1 was given
+2026-06-12 12:51:42,043 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 273542052 not found"}
+2026-06-27 12:39:23,024 - gpt_bot - ERROR - Webhook error: 'dict' object has no attribute 'user_email'
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers\webhook.py", line 82, in handle_max_webhook
+    await self.callback_handler.handle(update)
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers\callback_handler.py", line 59, in handle
+    if not user_obj or not user_obj.user_email:
+                           ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'user_email'
+2026-06-27 12:39:23,093 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 273542052 not found"}
+2026-06-27 12:41:19,798 - gpt_bot - ERROR - Webhook error: User.__init__() got an unexpected keyword argument 'available_queries'
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers\webhook.py", line 82, in handle_max_webhook
+    await self.callback_handler.handle(update)
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers\callback_handler.py", line 58, in handle
+    user_obj = await self.user_repo.get_user(user_id)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\db\repositories.py", line 15, in get_user
+    return User(**dict(row)) if row else None
+           ~~~~^^^^^^^^^^^^^
+TypeError: User.__init__() got an unexpected keyword argument 'available_queries'
+2026-06-27 12:41:19,856 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 273542052 not found"}
+2026-06-27 22:57:45,830 - gpt_bot - ERROR - Ошибка создания платежа: Ошибка платежной системы: {'type': 'error', 'id': '019f0aa8-d486-7d60-9cbf-cfade886b31c', 'description': "This store can't make recurring payments. Contact the YooMoney manager to learn more", 'code': 'forbidden'}
+2026-07-03 20:51:42,717 - gpt_bot - ERROR - Критическая ошибка при PUT-запросе: Cannot connect to host platform-api2.max.ru:443 ssl:True [SSLCertVerificationError: (1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')]
+2026-07-03 21:02:09,178 - gpt_bot - ERROR - Критическая ошибка в send_message: Object of type function is not JSON serializable
+2026-07-06 13:03:29,673 - gpt_bot - ERROR - Ошибка при отправке фото: {"code":"proto.payload","message":"errors.required"}
+2026-07-06 14:29:29,114 - gpt_bot - ERROR - Webhook error: ошибка синтаксиса (примерное положение: ",")
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers\webhook.py", line 82, in handle_max_webhook
+    await self.callback_handler.handle(update)
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers\callback_handler.py", line 117, in handle
+    current = await self.user_repo.get_selected_model(user_id)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\db\repositories.py", line 212, in get_selected_model
+    user = await self.get_user(user_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\db\repositories.py", line 22, in get_user
+    row = await conn.fetchrow(query, user_id)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\venv\Lib\site-packages\asyncpg\connection.py", line 752, in fetchrow
+    data = await self._execute(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\venv\Lib\site-packages\asyncpg\connection.py", line 1873, in _execute
+    result, _ = await self.__execute(
+                ^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\venv\Lib\site-packages\asyncpg\connection.py", line 1970, in __execute
+    result, stmt = await self._do_execute(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\venv\Lib\site-packages\asyncpg\connection.py", line 2013, in _do_execute
+    stmt = await self._get_statement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\venv\Lib\site-packages\asyncpg\connection.py", line 443, in _get_statement
+    statement = await self._protocol.prepare(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "asyncpg/protocol/protocol.pyx", line 165, in prepare
+asyncpg.exceptions.PostgresSyntaxError: ошибка синтаксиса (примерное положение: ",")
+2026-07-06 14:29:29,405 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 273542052 not found"}
+2026-07-06 14:31:40,400 - gpt_bot - ERROR - Ошибка OpenAI (gpt-image-1): Error code: 429 - {'error': {'message': 'Сейчас слишком большая нагрузка, попробуйте позже (request id: 20260706113135536782332Mc2HD05A)', 'type': 'neuroapi_error', 'param': '', 'code': 'get_channel_failed'}}
+2026-07-06 15:48:30,496 - gpt_bot - ERROR - Ошибка OpenAI (gpt-image-2): Error code: 503 - {'error': {'message': 'Модель gpt-image-2 временно недоступна для вашего тарифа. Обратитесь в техническую поддержку. (request id: 20260706124827604002395tdyOxuxN)', 'type': 'neuro_api_error'}}
+2026-07-06 16:03:16,885 - gpt_bot - ERROR - Webhook error: 'gpt-4o-mini'
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers\webhook.py", line 76, in handle_max_webhook
+    await self.message_handler.process(update)
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers\message_handler.py", line 52, in process
+    cost = self.ai.get_cost_for_user(user, image_url=image_url)
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\services\ai_service.py", line 19, in get_cost_for_user
+    provider = self.get_provider_for_user(user)
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\services\ai_service.py", line 16, in get_provider_for_user
+    return create_provider(model_id, OPENAI_API_KEY)
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\ai\providers.py", line 103, in create_provider
+    cfg = MODELS[DEFAULT_MODEL]
+          ~~~~~~^^^^^^^^^^^^^^^
+KeyError: 'gpt-4o-mini'
+2026-07-06 16:03:17,096 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 273542052 not found"}
+2026-07-06 16:14:25,251 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"proto.payload","message":"errors.required"}
+2026-07-06 17:07:04,393 - gpt_bot - ERROR - Ошибка API при отправке заглушки: <html>
+<head><title>502 Bad Gateway</title></head>
+<body>
+<center><h1>502 Bad Gateway</h1></center>
+<hr><center>kittenx</center>
+</body>
+</html>
+
+2026-07-06 17:30:32,478 - gpt_bot - ERROR - Ошибка API при отправке заглушки: <html>
+<head><title>502 Bad Gateway</title></head>
+<body>
+<center><h1>502 Bad Gateway</h1></center>
+<hr><center>kittenx</center>
+</body>
+</html>
+
+2026-07-06 18:44:22,259 - gpt_bot - ERROR - Ошибка send_document: {"code":"proto.payload","message":"Missing `token` in video attachment"}
+2026-07-06 18:47:43,714 - gpt_bot - ERROR - Ошибка при отправке фото: {"code":"proto.payload","message":"Failed to upload image."}
+2026-07-06 18:52:05,702 - gpt_bot - ERROR - Ошибка send_document: {"code":"proto.payload","message":"Missing `token` in video attachment"}
+2026-07-06 18:55:30,667 - gpt_bot - ERROR - Webhook error: MaxBot.send_document() got an unexpected keyword argument 'file_name'
+Traceback (most recent call last):
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers\webhook.py", line 76, in handle_max_webhook
+    await self.message_handler.process(update)
+  File "D:\Programingg\VSCodeProjects\gpt_bot_docker\handlers\message_handler.py", line 78, in process
+    await self.bot.send_document(chat_id, b64_content, file_name="image.png", caption=user_text)
+          ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: MaxBot.send_document() got an unexpected keyword argument 'file_name'
+2026-07-06 18:55:30,889 - gpt_bot - ERROR - Ошибка API при отправке заглушки: {"code":"chat.not.found","message":"Chat 273542052 not found"}
+2026-07-06 18:58:36,588 - gpt_bot - ERROR - Ошибка send_document: {"code":"proto.payload","message":"No `photos`, `url` or `token` provided. Check payload."}
+2026-07-06 19:27:20,185 - gpt_bot - ERROR - Ошибка при отправке фото: {"code":"proto.payload","message":"Failed to upload image."}
