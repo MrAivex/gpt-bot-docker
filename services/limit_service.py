@@ -28,3 +28,7 @@ class LimitService:
         updated = await self.user_repo.get_user(user_id)
         new_balance = updated.sub_queries + updated.bonus_queries if updated else 0
         return True, new_balance
+    
+    async def refund(self, user_id: int, amount: int):
+        """Возвращает указанное количество пазлов пользователю (в bonus_queries)."""
+        await self.user_repo.add_bonus_queries(user_id, amount)

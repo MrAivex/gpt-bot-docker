@@ -141,7 +141,7 @@ class CommandHandler:
 
         if re.match(EMAIL_REGEX, text): # v
             await self.user_repo.update_user_email(user_id, text)
-            await self.bot.edit_message(chat_id, update.message_id, self.msg.save_email(text), 
+            await self.bot.send_message(chat_id, self.msg.save_email(text), 
                                         self.kb.menu_button_new_msg())
             return True
 

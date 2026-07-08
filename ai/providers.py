@@ -48,7 +48,8 @@ class OpenAIProvider(AIProvider):
             return response.choices[0].message.content
         except Exception as e:
             logger.error(f"Ошибка OpenAI ({self.model}): {e}")
-            return "🤖 Не удалось получить ответ."
+            return ("🤖 Не удалось получить ответ."
+                    "Потраченные 🧩 пазлы возвращены на баланс в раздел 'Бонусные'")
 
     async def generate_image_from_text(self, prompt: str) -> str:
         """Text‑to‑image через images.generate"""
@@ -62,7 +63,8 @@ class OpenAIProvider(AIProvider):
             return self._handle_image_response(response)
         except Exception as e:
             logger.error(f"Ошибка генерации ({self.model}): {e}")
-            return "🤖 Не удалось создать изображение."
+            return ("🤖 Не удалось создать изображение."
+                    "Потраченные 🧩 пазлы возвращены на баланс в раздел 'Бонусные'")
 
     async def edit_image(self, image_url: str, prompt: str) -> str:
         """img‑2‑img через images.edit"""
@@ -76,7 +78,8 @@ class OpenAIProvider(AIProvider):
             return self._handle_image_response(response)
         except Exception as e:
             logger.error(f"Ошибка редактирования ({self.model}): {e}")
-            return "🤖 Не удалось отредактировать изображение."
+            return ("🤖 Не удалось отредактировать изображение."
+                    "Потраченные 🧩 пазлы возвращены на баланс в раздел 'Бонусные'")
 
     def _handle_image_response(self, response) -> str:
         if response.data and len(response.data) > 0:

@@ -210,6 +210,11 @@ class UserRepository:
     async def get_selected_model(self, user_id: int) -> str:
         user = await self.get_user(user_id)
         return user.selected_model if user and user.selected_model else DEFAULT_MODEL
+    
+    async def add_bonus_queries(self, user_id: int, amount: int):
+        query = "UPDATE users SET bonus_queries = bonus_queries + $1 WHERE user_id = $2"
+        async with self.pool.acquire() as conn:
+            await conn.execute(query, amount, user_id)
 
 
 class MessageRepository:

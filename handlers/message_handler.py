@@ -69,6 +69,16 @@ class MessageHandler:
         # 5. Вызов AI
         ai_response = await self.ai.generate_response(user, user_text, image_url)
 
+        # 🔁 Возврат пазлов при ошибке генерации
+        if isinstance(ai_response, str) and ai_response.startswith("🤖 Не удалось"):
+            if user_id not in ADMIN_ID:
+                await self.limit.refund(user_id, cost)
+            if stub_msg_id:
+                await self.bot.edit_message(chat_id, stub_msg_id, ai_response)
+            else:
+                await self.bot.send_message(chat_id, ai_response)
+            return
+
         # 6. Обработка ответа
         if isinstance(ai_response, str) and ai_response.startswith("data:image/"):
             b64_content = ai_response.split(",", 1)[1]
