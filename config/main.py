@@ -26,7 +26,8 @@ EMAIL_REGEX = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
 
 #------------ЗАПУСК НА СЕРВАКЕ------------------------------------------------------------------------------
 TOKEN = "f9LHodD0cOJJRiHaYG-mG1_HdoxpzU-e4nyNFAv7RiLsJ6BGBunLQsdCEMlY5wco6ZBJwg4KIcOtSf_DBp8q"
-DB_DSN = "postgresql://postgres:NoForgot_938@db:5432/gpt_bot_db"
+# DB_DSN = "postgresql://postgres:NoForgot_938@db:5432/gpt_bot_db"
+DB_DSN = "postgresql://botuser:ваш_надёжный_пароль@db:5432/maxgptdb"
 WEBHOOK_URL=f"https://max-gpt-ai-helper-bot.ru{WEBHOOK_PATH}"
 RETURN_URL="https://max.ru/id973302994385_bot"
 REF_URL="https://max.ru/id973302994385_bot"
