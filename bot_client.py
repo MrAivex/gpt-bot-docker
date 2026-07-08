@@ -4,7 +4,7 @@ from config.logger import logger
 class MaxBot:
     def __init__(self, token):
         self.token = token
-        self.base_url = "https://platform-api.max.ru" 
+        self.base_url = "https://platform-api2.max.ru" 
 
     async def send_message(self, chat_id, text, reply_markup=None):
         url = f"{self.base_url}/messages?chat_id={chat_id}"
