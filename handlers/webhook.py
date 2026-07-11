@@ -6,14 +6,19 @@ from handlers.models import Update
 from handlers.command_handler import CommandHandler
 from handlers.message_handler import MessageHandler
 from handlers.callback_handler import CallbackHandler
+from templates.messages import Messages
+from templates.keyboards import Keyboards
 from config.main import CHANNEL_ID
 
 
 class WebhookHandler:
-    def __init__(self, container):
+    def __init__(self, container, messages: Messages, keyboards: Keyboards):
         self.container = container
         self.bot = container.bot
         self.user_repo = container.user_repo
+
+        self.msg = messages
+        self.kb = keyboards
 
         self.callback_handler = CallbackHandler(
             container.bot,
@@ -77,7 +82,8 @@ class WebhookHandler:
                     if status != 'subscribed':
                         await self.user_repo.set_subscription_bonus(update.user_id)
                         # Отправляем сообщение пользователю
-                        await self.bot.send_message(update.chat_id, self.msg.BONUS_GRANTED)
+                        await self.bot.send_message(update.chat_id, self.msg.BONUS_GRANTED, 
+                                                    reply_markup=self.kb.menu_button_new_msg())
                 return web.Response(status=200)
 
             if update.type == 'message_created':
