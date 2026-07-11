@@ -74,7 +74,6 @@ class WebhookHandler:
                 return web.Response(status=200)
             
             if update.type == 'user_added':
-                logger.info("Подписался на канал")
                 channel_id = data.get('chat_id')
                 user_id_added = data.get('user', {}).get('user_id')
                 user_data = await self.user_repo.get_user(user_id_added)
@@ -88,6 +87,7 @@ class WebhookHandler:
                             # Отправляем сообщение пользователю
                             await self.bot.send_message(user_chat_id, self.msg.BONUS_GRANTED, 
                                                         reply_markup=self.kb.menu_button_new_msg())
+                logger.info(channel_id, user_id_added, user_chat_id, status)
                 return web.Response(status=200)
 
             if update.type == 'message_created':
