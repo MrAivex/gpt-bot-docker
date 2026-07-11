@@ -76,14 +76,18 @@ class WebhookHandler:
             if update.type == 'user_added':
                 logger.info("Подписался на канал")
                 channel_id = data.get('chat_id')
-                if channel_id == CHANNEL_ID:   # импортировать из config.main
-                    # Начисляем бонус, если ещё не получал
-                    status = await self.user_repo.get_subscribe_on_channel(update.user_id)
-                    if status != 'subscribed':
-                        await self.user_repo.set_subscription_bonus(update.user_id)
-                        # Отправляем сообщение пользователю
-                        await self.bot.send_message(update.chat_id, self.msg.BONUS_GRANTED, 
-                                                    reply_markup=self.kb.menu_button_new_msg())
+                user_id_added = data.get('user', {}).get('user_id')
+                user_data = await self.user_repo.get_user(user_id_added)
+                if user_data:
+                    user_chat_id = user_data.chat_id
+                    if channel_id == CHANNEL_ID:   # импортировать из config.main
+                        # Начисляем бонус, если ещё не получал
+                        status = await self.user_repo.get_subscribe_on_channel(user_id_added)
+                        if status != 'subscribed':
+                            await self.user_repo.set_subscription_bonus(user_id_added)
+                            # Отправляем сообщение пользователю
+                            await self.bot.send_message(user_chat_id, self.msg.BONUS_GRANTED, 
+                                                        reply_markup=self.kb.menu_button_new_msg())
                 return web.Response(status=200)
 
             if update.type == 'message_created':
