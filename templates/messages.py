@@ -1,5 +1,5 @@
 # messages.py
-from config.main import REF_URL, SUPPORT_LINK
+from config.main import REF_URL, SUPPORT_LINK, CHANNEL_LINK
 
 class Messages:
     # Лимиты
@@ -60,8 +60,8 @@ class Messages:
 
     BONUS_GRANTED = "✅ Спасибо за подписку! Вам начислено 10 пазлов."
 
-    SUBSCRIBE_TO_GET_BONUS = ("🔔 Подпишитесь на наш канал, чтобы получить 10 пазлов в подарок!\n "
-                              "После подписки повторно нажмите кнопку '🎁 Подписаться на канал'.")
+    SUBSCRIBE_TO_GET_BONUS = ("🔔 Подпишитесь на наш канал, чтобы получить 10 пазлов в подарок!\n\n "
+                              f"Наш канал: \n{CHANNEL_LINK}")
 
     FREE_PUZZLE = "Вы можете бесплатно получить 🧩 пазлы, подписавшись на канал или пригласив друга"
     
