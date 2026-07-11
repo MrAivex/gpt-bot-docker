@@ -64,7 +64,8 @@ class WebhookHandler:
                 return web.Response(status=200)
 
             # Обновляем активность пользователя
-            await self.user_repo.update_user_activity(update.user_id, update.chat_id)
+            if update.user_id and update.chat_id:
+                await self.user_repo.update_user_activity(update.user_id, update.chat_id)
 
             # Маршрутизация
             if update.type == 'bot_started':
