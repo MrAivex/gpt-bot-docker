@@ -33,7 +33,10 @@ class AIService:
             response = await provider.get_answer(messages, image_url)
 
         await self.message_repo.save_message(user.user_id, 'user', user_text)
-        await self.message_repo.save_message(user.user_id, 'assistant', response)
+        if isinstance(response, str) and (response.startswith("data:image/") or response.startswith("BASE64:")):
+            await self.message_repo.save_message(user.user_id, 'assistant', "[image]")
+        else:
+            await self.message_repo.save_message(user.user_id, 'assistant', response)
         return response
         
     @staticmethod
