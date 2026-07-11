@@ -195,7 +195,9 @@ class CommandHandler:
                     f"🔹 Последняя активность: `{last_active_str}`\n"
                     f"🔹 chat_id: `{user_chat_id}`\n"
                     f"🔹 referrer_id: `{referrer}`\n"
-                    f"🔹 selected_model: `{user_info.selected_model or "не выбрана"}`"
+                    f"🔹 selected_model: `{user_info.selected_model or "не выбрана"}`\n"
+                    f"🔹 subscribe_on_channel: {user_info.subscribe_on_channel} "
+                    
                 )
                 await self.bot.send_message(chat_id, report)
             except ValueError:
