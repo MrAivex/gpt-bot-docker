@@ -69,6 +69,7 @@ class WebhookHandler:
                 return web.Response(status=200)
             
             if update.type == 'user_added':
+                logger.info("Подписался на канал")
                 channel_id = data.get('chat_id')
                 if channel_id == CHANNEL_ID:   # импортировать из config.main
                     # Начисляем бонус, если ещё не получал
