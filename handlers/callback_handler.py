@@ -132,20 +132,7 @@ class CallbackHandler:
             return True
         
         if payload == "subscribe_channel":
-            status = await self.user_repo.get_subscribe_on_channel(user_id)
-            if status == 'subscribed':
-                await self.bot.send_message(chat_id, self.msg.BONUS_ALREADY_CLAIMED, 
-                                            reply_markup=self.kb.menu_button_new_msg())
-                return True
-
-            from config.main import CHANNEL_ID
-            is_subscribed = await self.bot.check_channel_subscription(user_id, CHANNEL_ID)
-            if is_subscribed:
-                await self.user_repo.set_subscription_bonus(user_id)
-                await self.bot.send_message(chat_id, self.msg.BONUS_GRANTED, 
-                                            reply_markup=self.kb.menu_button_new_msg())
-            else:
-                await self.bot.send_message(chat_id, self.msg.SUBSCRIBE_TO_GET_BONUS, 
+            await self.bot.edit_message(chat_id, update.message_id, self.msg.SUBSCRIBE_TO_GET_BONUS, 
                                             reply_markup=self.kb.menu_button_new_msg())
             return True
         
