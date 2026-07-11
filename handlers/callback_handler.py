@@ -133,7 +133,7 @@ class CallbackHandler:
         
         if payload == "subscribe_channel":
             await self.bot.edit_message(chat_id, update.message_id, self.msg.SUBSCRIBE_TO_GET_BONUS, 
-                                            reply_markup=self.kb.menu_button_new_msg())
+                                            reply_markup=self.kb.menu_button_edit_msg())
             return True
         
         if payload == "free_puzzle":
