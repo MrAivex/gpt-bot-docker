@@ -133,12 +133,25 @@ class CallbackHandler:
         
         if payload == "subscribe_channel":
             await self.bot.edit_message(chat_id, update.message_id, self.msg.SUBSCRIBE_TO_GET_BONUS, 
-                                            reply_markup=self.kb.menu_button_edit_msg())
+                                            reply_markup=self.kb.check_subscription())
             return True
         
         if payload == "free_puzzle":
             await self.bot.edit_message(chat_id, update.message_id, self.msg.FREE_PUZZLE, 
                                         reply_markup=self.kb.free_puzzle())
             return True
+        
+        if payload == "check_subscription":
+            # Проверяем только локальный статус, без API запроса
+            status = await self.user_repo.get_subscribe_on_channel(user_id)
+            if status == 'subscribed':
+                await self.bot.edit_message(chat_id, self.msg.BONUS_ALREADY_CLAIMED, 
+                                            reply_markup=self.kb.menu_button_edit_msg())
+                return True
+            else:
+                # Предлагаем подписаться на канал  # ссылка на канал
+                await self.bot.edit_message(chat_id, update.message_id, self.msg.SUBSCRIBE_TO_GET_BONUS, 
+                                            reply_markup=self.kb.menu_button_edit_msg())
+                return True
 
         return False

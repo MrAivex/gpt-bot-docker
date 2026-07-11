@@ -180,3 +180,15 @@ class Keyboards:
             "type": "inline_keyboard",
             "payload": {"buttons": buttons}
         }]
+    
+    @staticmethod
+    def check_subscription():
+        return [{
+            "type": "inline_keyboard",
+            "payload": {
+                "buttons": [
+                    [{"type": "callback", "text": "✅ Проверить подписку", "payload": "check_subscription"}],
+                    [{"type": "callback", "text": "📌 Меню", "payload": "show_main_menu_edit"}]
+                ]
+            }
+        }]
