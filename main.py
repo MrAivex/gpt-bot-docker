@@ -28,7 +28,7 @@ async def on_startup(app):
 
     # 3. Подключаем маршруты к уже готовому контейнеру
     from handlers.webhook import WebhookHandler
-    handler = WebhookHandler(container)
+    handler = WebhookHandler(container, container.messages, container.keyboards)
     app.router.add_post(WEBHOOK_PATH, handler.handle_max_webhook)
     app.router.add_post('/yookassa-webhook', handler.handle_yookassa_webhook)
 
