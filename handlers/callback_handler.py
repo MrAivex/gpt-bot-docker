@@ -145,7 +145,7 @@ class CallbackHandler:
             # Проверяем только локальный статус, без API запроса
             status = await self.user_repo.get_subscribe_on_channel(user_id)
             if status == 'subscribed':
-                await self.bot.edit_message(chat_id, self.msg.BONUS_ALREADY_CLAIMED, 
+                await self.bot.edit_message(chat_id, update.message_id, self.msg.BONUS_ALREADY_CLAIMED, 
                                             reply_markup=self.kb.menu_button_edit_msg())
                 return True
             else:
