@@ -35,7 +35,6 @@ class Keyboards:
                         {"type": "callback", "text": "🔧 Помощь", "payload": "support"},
                         {"type": "callback", "text": "🧩 Баланс", "payload": "my_queries"}],
                     [
-                        {"type": "callback", "text": "👥 Пригласить друга", "payload": "show_referal_link"},
                         {"type": "callback", "text": "🎁 Бесплатные пазлы 🧩", "payload": "free_puzzle"}]
                 ]
             }
