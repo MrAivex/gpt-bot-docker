@@ -11,17 +11,25 @@ class Update:
         if update_type == 'bot_started':
             self.user_id = int(data.get('user', {}).get('user_id', 0))
             self.chat_id = int(data.get('chat_id', 0))
+
         elif update_type == 'message_created':
             msg = data.get('message', {})
             self.user_id = int(msg.get('sender', {}).get('user_id', 0))
             self.chat_id = int(msg.get('recipient', {}).get('chat_id') or msg.get('chat_id', 0))
             self.message_id = msg.get('body', {}).get('mid')
+
         elif update_type == 'message_callback':
             cb = data.get('callback', {})
             self.user_id = int(cb.get('user', {}).get('user_id', 0))
             msg = data.get('message', {})
             self.chat_id = int(msg.get('recipient', {}).get('chat_id') or msg.get('chat_id', 0))
             self.message_id = msg.get('body', {}).get('mid')
+
+        elif update_type == 'user_added':
+            # В user_added chat_id — это ID канала, а не пользователя, поэтому здесь не сохраняем его как chat_id пользователя
+            self.user_id = int(data.get('user', {}).get('user_id', 0))
+            self.chat_id = 0
+
         else:
             # fallback на старую логику (на всякий случай)
             self.user_id = int(
@@ -45,6 +53,8 @@ class Update:
 
     @property
     def is_valid(self) -> bool:
+        if self.type == 'user_added':
+            return bool(self.user_id)   # достаточно только user_id
         return bool(self.user_id and self.chat_id)
 
     @property
