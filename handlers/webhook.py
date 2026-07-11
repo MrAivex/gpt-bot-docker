@@ -88,7 +88,6 @@ class WebhookHandler:
                             # Отправляем сообщение пользователю
                             await self.bot.send_message(user_chat_id, self.msg.BONUS_GRANTED, 
                                                         reply_markup=self.kb.menu_button_new_msg())
-                logger.info(user_chat_id)
                 return web.Response(status=200)
 
             if update.type == 'message_created':

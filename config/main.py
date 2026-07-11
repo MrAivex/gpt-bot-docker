@@ -8,7 +8,8 @@ import os
 WEBHOOK_PATH = "/max-webhook"
 ADMIN_ID = [5787551, 38065306]
 # OPENAI_API_KEY = "sk-jEDV6RE5q33qb53PDf58LVt4LjA2MS8ei9rPdg1pLw2GgCyN" # Гришин
-OPENAI_API_KEY = "sk-n8X3mxjQarPm1MsghpnZvzPHmgubDLEHkUQ3WoiZgMpa3XUV" # Мой
+# OPENAI_API_KEY = "sk-n8X3mxjQarPm1MsghpnZvzPHmgubDLEHkUQ3WoiZgMpa3XUV" # Мой пилот
+OPENAI_API_KEY = "sk-Lye5RXdj4K89NS7XoTFDInpd4p8626ZfspLkbgkgxdDc8DAO" # Мой ортимальный
 SUPPORT_LINK="https://max.ru/u/f9LHodD0cOIdennqYfdEQFtEvXCDlTkAAm3lFWmfN4GgG94KMLS2FqXsgr8"
 ADMIN_COMMANDS=["/admin", "/count", "/user", "/update", "/max_queries", "/active_users", "/delete", "/send",\
                 "/refered_users", "/chat_ids"]
