@@ -69,7 +69,7 @@ class WebhookHandler:
                 return web.Response(status=200)
             
             if update.type == 'user_added':
-                channel_id = data.get('channel', {}).get('id')
+                channel_id = data.get('chat_id')
                 if channel_id == CHANNEL_ID:   # импортировать из config.main
                     # Начисляем бонус, если ещё не получал
                     status = await self.user_repo.get_subscribe_on_channel(update.user_id)
