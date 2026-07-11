@@ -154,3 +154,26 @@ class MaxBot:
         except Exception as e:
             logger.error(f"Ошибка send_document: {e}")
             return None
+        
+
+    async def check_channel_subscription(self, user_id: int, channel_id: int) -> bool:
+        """
+        Проверяет, подписан ли пользователь на канал.
+        channel_id – ID канала (обычно отрицательный).
+        Возвращает True, если подписан.
+        """
+        url = f"{self.base_url}/channels/{channel_id}/members/{user_id}"
+        headers = {"Authorization": self.token}
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, headers=headers) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        # Предполагаем, что в ответе есть поле status или member
+                        return data.get("status") == "member" or data.get("member") is not None
+                    else:
+                        logger.warning(f"Ошибка проверки подписки: {resp.status} {await resp.text()}")
+                        return False
+        except Exception as e:
+            logger.error(f"Ошибка check_channel_subscription: {e}")
+            return False

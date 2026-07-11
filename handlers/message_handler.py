@@ -74,9 +74,9 @@ class MessageHandler:
             if user_id not in ADMIN_ID:
                 await self.limit.refund(user_id, cost)
             if stub_msg_id:
-                await self.bot.edit_message(chat_id, stub_msg_id, ai_response)
+                await self.bot.edit_message(chat_id, stub_msg_id, ai_response, self.kb.menu_button_new_msg())
             else:
-                await self.bot.send_message(chat_id, ai_response)
+                await self.bot.send_message(chat_id, ai_response, self.kb.menu_button_new_msg())
             return
 
         # 6. Обработка ответа

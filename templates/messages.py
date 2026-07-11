@@ -55,6 +55,12 @@ class Messages:
     COOLDOWN_WARNING = "⚠️ Пожалуйста, подождите 3 секунды..."
 
     MODELS_HEADER = "🧠 Выберите нейросеть:"
+
+    BONUS_ALREADY_CLAIMED = "🎁 Вы уже получали бонус за подписку."
+
+    BONUS_GRANTED = "✅ Спасибо за подписку! Вам начислено 10 пазлов."
+
+    SUBSCRIBE_TO_GET_BONUS = "🔔 Подпишитесь на наш канал, чтобы получить 10 пазлов в подарок!"
     
 
     @staticmethod

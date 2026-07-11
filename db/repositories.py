@@ -216,6 +216,18 @@ class UserRepository:
         async with self.pool.acquire() as conn:
             await conn.execute(query, amount, user_id)
 
+    async def get_subscribe_on_channel(self, user_id: int) -> str:
+        user = await self.get_user(user_id)
+        return user.subscribe_on_channel if user else 'not_subscribe'
+    
+    async def set_subscription_bonus(self, user_id: int):
+        """Обновляет флаг подписки и начисляет 10 бонусных пазлов."""
+        await self._update_field(user_id, 'subscribe_on_channel', 'subscribed')
+        # Увеличиваем bonus_queries на 10
+        query = "UPDATE users SET bonus_queries = bonus_queries + 10 WHERE user_id = $1"
+        async with self.pool.acquire() as conn:
+            await conn.execute(query, user_id)
+
 
 class MessageRepository:
     def __init__(self, pool: asyncpg.Pool):

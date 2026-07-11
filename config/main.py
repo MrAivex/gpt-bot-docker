@@ -13,6 +13,7 @@ SUPPORT_LINK="https://max.ru/u/f9LHodD0cOIdennqYfdEQFtEvXCDlTkAAm3lFWmfN4GgG94KM
 ADMIN_COMMANDS=["/admin", "/count", "/user", "/update", "/max_queries", "/active_users", "/delete", "/send",\
                 "/refered_users", "/chat_ids"]
 EMAIL_REGEX = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+CHANNEL_ID = -1001234567890
 
 #------------ЛОКАЛЬНЫЙ ЗАПУСК-------------------------------------------------------------------------------
 # TOKEN = "f9LHodD0cOKpRm54dQO2ji8dNZcUtkJSpeFRWkP98hwIPZO3R9PtiSg759pxVK7jWQNNCePOp5eldQ8_MpDN"

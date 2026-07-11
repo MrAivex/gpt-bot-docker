@@ -29,14 +29,30 @@ class Keyboards:
             "payload": {
                 "buttons": [
                     [
-                        {"type": "callback", "text": "⭐ Тарифы", "payload": "see_subscriptions"},
-                        {"type": "callback", "text": "⚙️ Настройки", "payload": "settings"}
-                        ],
+                        {"type": "callback", "text": "🤖 Выбрать модель", "payload": "select_model"},
+                        {"type": "callback", "text": "⚙️ Настройки", "payload": "settings"}],
                     [
                         {"type": "callback", "text": "🔧 Помощь", "payload": "support"},
                         {"type": "callback", "text": "🧩 Баланс", "payload": "my_queries"}],
                     [
-                        {"type": "callback", "text": "👥 Пригласить друга", "payload": "show_referal_link"}]
+                        {"type": "callback", "text": "👥 Пригласить друга", "payload": "show_referal_link"},
+                        {"type": "callback", "text": "🎁 Бесплатные пазлы 🧩", "payload": "free_puzzle"}]
+                ]
+            }
+        }]
+    
+    @staticmethod
+    def free_puzzle():
+        return [{
+            "type": "inline_keyboard",
+            "payload": {
+                "buttons": [
+                    [
+                        {"type": "callback", "text": "👥 Пригласить друга", "payload": "show_referal_link"}],
+                    [
+                        {"type": "callback", "text": "🎁 Подписаться на канал", "payload": "subscribe_channel"}],
+                    [
+                        {"type": "callback", "text": "📌 Меню", "payload": "show_main_menu_edit"}]
                 ]
             }
         }]
@@ -48,7 +64,7 @@ class Keyboards:
             "payload": {
                 "buttons": [
                     [
-                        {"type": "callback", "text": "🤖 Выбрать модель", "payload": "select_model"},
+                        {"type": "callback", "text": "⭐ Тарифы", "payload": "see_subscriptions"},
                         {"type": "callback", "text": "⭐ Мой тариф", "payload": "subscription_status"}],
                     [
                         {"type": "callback", "text": "📋 О боте", "payload": "about_bot"},

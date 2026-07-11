@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
     payment_token TEXT,
     referrer_id BIGINT,
     chat_id BIGINT,
-    subscribe_on_channel TEXT,
+    subscribe_on_channel TEXT DEFAULT 'not_subscribe',
     bonus_queries BIGINT DEFAULT 10,
     selected_model TEXT DEFAULT 'gpt-4o-mini'
 );
@@ -29,7 +29,7 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS user_email TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS referrer_id BIGINT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS chat_id BIGINT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS payment_token TEXT;
-ALTER TABLE users ADD COLUMN IF NOT EXISTS subscribe_on_channel TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS subscribe_on_channel TEXT DEFAULT 'not_subscribe';
 ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_status TEXT DEFAULT 'inactive';
 ALTER TABLE users ADD COLUMN IF NOT EXISTS selected_model TEXT DEFAULT 'gpt-4o-mini';
 
