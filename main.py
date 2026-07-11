@@ -17,7 +17,7 @@ async def on_startup(app):
     headers = {"Authorization": TOKEN, "Content-Type": "application/json"}
     try:
         async with aiohttp.ClientSession() as session:
-            payload = {"url": WEBHOOK_URL, "event_types": ["message_created"]}
+            payload = {"url": WEBHOOK_URL, "event_types": ["message_created", "user_added"]}
             async with session.post(api_url, json=payload, headers=headers) as resp:
                 if resp.status in [200, 201]:
                     logger.info(f"Вебхук зарегистрирован: {WEBHOOK_URL}")

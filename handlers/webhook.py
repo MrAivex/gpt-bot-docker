@@ -6,6 +6,7 @@ from handlers.models import Update
 from handlers.command_handler import CommandHandler
 from handlers.message_handler import MessageHandler
 from handlers.callback_handler import CallbackHandler
+from config.main import CHANNEL_ID
 
 
 class WebhookHandler:
@@ -65,6 +66,17 @@ class WebhookHandler:
                 # Обрабатываем как команду /start (в command_handler)
                 update.text = "/start"  # имитируем текстовую команду
                 await self.command_handler.handle(update)
+                return web.Response(status=200)
+            
+            if update.type == 'user_added':
+                channel_id = data.get('channel', {}).get('id')
+                if channel_id == CHANNEL_ID:   # импортировать из config.main
+                    # Начисляем бонус, если ещё не получал
+                    status = await self.user_repo.get_subscribe_on_channel(update.user_id)
+                    if status != 'subscribed':
+                        await self.user_repo.set_subscription_bonus(update.user_id)
+                        # Отправляем сообщение пользователю
+                        await self.bot.send_message(update.chat_id, self.msg.BONUS_GRANTED)
                 return web.Response(status=200)
 
             if update.type == 'message_created':
