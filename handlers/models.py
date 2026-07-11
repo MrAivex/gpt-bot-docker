@@ -31,10 +31,8 @@ class Update:
                 0
             )
             self.chat_id = int(
-                data.get('chat_id') or
                 data.get('message', {}).get('chat_id') or
-                data.get('message', {}).get('recipient', {}).get('chat_id') or
-                0
+                data.get('message', {}).get('recipient', {}).get('chat_id') or 0
             )
 
         # Остальные поля (text, attachments и т.д.) оставь как были
