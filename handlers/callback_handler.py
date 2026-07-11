@@ -146,5 +146,9 @@ class CallbackHandler:
                 await self.bot.send_message(chat_id, self.msg.SUBSCRIBE_TO_GET_BONUS)
             return True
         
+        if payload == "free_puzzle":
+            await self.bot.edit_message(chat_id, update.message_id, self.msg.FREE_PUZZLE, 
+                                        reply_markup=self.kb.free_puzzle())
+            return True
 
         return False
