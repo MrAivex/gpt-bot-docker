@@ -20,7 +20,7 @@ class SubscriptionService:
         else:
             # Разовый пакет – добавляем bonus_queries
             await self.user_repo.add_bonus_queries(user_id, plan.bonus_queries)
-            return True, f"Пакет '{plan.name}' приобретён, +{plan.bonus_queries} пазлов"
+            return True, f"{plan.name} приобретён, +{plan.bonus_queries} пазлов"
 
     async def deactivate_expired(self):
         """Деактивирует все подписки с истекшим сроком."""
