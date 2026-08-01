@@ -102,7 +102,7 @@ class UserRepository:
 
     async def activate_subscription(self, user_id: int, sub_id: str, sub_info: dict):
         """Активирует/продлевает подписку на основе переданного словаря sub_info"""
-        new_limit = sub_info.requests
+        new_limit = sub_info.sub_queries
         duration_days = sub_info.duration_days
         query = '''
             UPDATE users 
