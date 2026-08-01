@@ -96,19 +96,14 @@ class OpenAIProvider(AIProvider):
 
 # Реестр моделей: {id: {class, kwargs, type}}
 MODELS = {
-    "gpt-4o": {
+    "gpt-4o": { # 2 руб./ запрос
         "provider_class": OpenAIProvider,
-        "kwargs": {"model": "gpt-4o", "cost_per_request": 1, "supports_image": False},
+        "kwargs": {"model": "gpt-4o", "cost_per_request": 15, "supports_image": False},
         "type": "text"
     },
-    "gpt-image-1": {
+    "gpt-image-2": { # 10 руб./ запрос
         "provider_class": OpenAIProvider,
-        "kwargs": {"model": "gpt-image-1", "cost_per_request": 20, "supports_image": True},
-        "type": "image"
-    },
-    "gemini-3-pro-image-preview": {
-        "provider_class": OpenAIProvider,
-        "kwargs": {"model": "gemini-3-pro-image-preview", "cost_per_request": 20, "supports_image": True},
+        "kwargs": {"model": "gpt-image-2", "cost_per_request": 75, "supports_image": True},
         "type": "image"
     },
     # будущие модели:

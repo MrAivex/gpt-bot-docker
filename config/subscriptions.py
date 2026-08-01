@@ -6,19 +6,23 @@ class SubscriptionPlan:
     id: str
     name: str
     price: int
-    requests: int
-    duration_days: int
+    sub_queries: int = 0
+    bonus_queries: int = 0
+    duration_days: int = 0   # 0 = разовый пакет, >0 = подписка
 
 
 _ALL_PLANS = [
-    SubscriptionPlan("inactive", "Нет подписки", 0, 0, 0),
-    SubscriptionPlan("sub_unlim_1d", "Безлимит на день", 39, 10000, 1),
-    SubscriptionPlan("sub_unlim_3d", "Безлимит на 3 дня", 99, 30000, 3),
-    SubscriptionPlan("sub_unlim_7d", "Безлимит на неделю", 189, 70000, 7),
-    SubscriptionPlan("sub_10", "10 запросов/день на месяц", 79, 10, 31),
-    SubscriptionPlan("sub_20", "20 запросов/день на месяц", 159, 20, 31),
-    SubscriptionPlan("sub_40", "40 запросов/день на месяц", 309, 40, 31),
-    SubscriptionPlan("sub_100", "100 запросов/день на месяц", 779, 100, 31),
+    SubscriptionPlan("inactive", "Нет подписки", 0, 10, 0, 0),
+    SubscriptionPlan("sub_50_31", "50 🧩/день на месяц", 199, 50, 0, 31),
+    SubscriptionPlan("sub_100_31", "100 🧩/день на месяц", 399, 100, 0, 31),
+    SubscriptionPlan("sub_200_31", "200 🧩/день на месяц", 699, 200, 0, 31),
+    SubscriptionPlan("sub_100_0", "Пакет 100 🧩", 19, 0, 100, 0),
+    SubscriptionPlan("sub_300_0", "Пакет 300 🧩", 49, 0, 300, 0),
+    SubscriptionPlan("sub_500_0", "Пакет 500 🧩", 79, 0, 500, 0),
+    SubscriptionPlan("sub_1000_0", "Пакет 1000 🧩", 149, 0, 1000, 0),
+    SubscriptionPlan("sub_3000_0", "Пакет 3000 🧩", 439, 0, 3000, 0),
+    SubscriptionPlan("sub_10000_0", "Пакет 10000 🧩", 1399, 0, 10000, 0),
+    
 ]
 
 # Словарь доступных для покупки (без inactive)

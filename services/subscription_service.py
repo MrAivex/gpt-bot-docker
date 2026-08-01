@@ -7,15 +7,20 @@ class SubscriptionService:
     def __init__(self, user_repo: UserRepository):
         self.user_repo = user_repo
 
-    async def activate_or_extend(self, user_id: int, sub_id: str):
-        """Активирует новую подписку или продлевает текущую."""
-        sub_info = AVAILABLE_SUBSCRIPTIONS.get(sub_id) or DEFAULT_SUBSCRIPTION.get(sub_id)
-        if not sub_info:
-            logger.error(f"Неизвестный sub_id: {sub_id}")
-            return False
-        await self.user_repo.activate_subscription(user_id, sub_id, sub_info)
-        logger.info(f"Подписка {sub_id} активирована для user {user_id}")
-        return True
+    async def activate_or_extend(self, user_id: int, sub_id: str) -> tuple[bool, str]:
+        plan = AVAILABLE_SUBSCRIPTIONS.get(sub_id)
+        if not plan:
+            logger.error(f"Неизвестный план: {sub_id}")
+            return False, "Неизвестный план"
+
+        if plan.duration_days > 0:
+            # Это подписка – обновляем sub_queries и срок
+            await self.user_repo.activate_subscription(user_id, sub_id, plan)
+            return True, f"Подписка '{plan.name}' активирована"
+        else:
+            # Разовый пакет – добавляем bonus_queries
+            await self.user_repo.add_bonus_queries(user_id, plan.bonus_queries)
+            return True, f"Пакет '{plan.name}' приобретён, +{plan.bonus_queries} пазлов"
 
     async def deactivate_expired(self):
         """Деактивирует все подписки с истекшим сроком."""

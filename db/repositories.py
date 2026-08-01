@@ -25,7 +25,7 @@ class UserRepository:
     async def update_user_activity(self, user_id: int, chat_id: int):
         query = '''
             INSERT INTO users (user_id, chat_id, last_active, bonus_queries, subscription_status, sub_queries)
-            VALUES ($1, $2, CURRENT_TIMESTAMP, 10, 'inactive', 0)
+            VALUES ($1, $2, CURRENT_TIMESTAMP, 0, 'inactive', 10)
             ON CONFLICT (user_id) DO UPDATE 
             SET chat_id = EXCLUDED.chat_id, 
                 last_active = CURRENT_TIMESTAMP
@@ -83,7 +83,7 @@ class UserRepository:
         final_referrer = referrer_id if referrer_id and referrer_id != user_id else None
         query = '''
             INSERT INTO users (user_id, chat_id, referrer_id, bonus_queries, last_active, subscription_status, sub_queries)
-            VALUES ($1, $2, $3, 10, CURRENT_TIMESTAMP, 'inactive', 0)
+            VALUES ($1, $2, $3, 0, CURRENT_TIMESTAMP, 'inactive', 10)
         '''
         async with self.pool.acquire() as conn:
             await conn.execute(query, user_id, chat_id, final_referrer)
@@ -118,7 +118,7 @@ class UserRepository:
             await conn.execute(query, sub_id, new_limit, str(duration_days), user_id)
 
     async def deactivate_expired_subscriptions(self, inactive_status='inactive'):
-        default_requests = 0  # DEFAULT_SUBSCRIPTION.requests
+        default_requests = 10  # DEFAULT_SUBSCRIPTION.requests
         query = '''
             UPDATE users 
             SET subscription_status = $1,
@@ -134,17 +134,15 @@ class UserRepository:
             await conn.execute(query, inactive_status, default_requests)
 
     async def reset_subscription_limits(self, subscriptions_config: dict):
-        """Массовый сброс лимитов согласно конфигу подписок"""
         case_parts = []
         for sub_id, info in subscriptions_config.items():
-            case_parts.append(f"WHEN subscription_status = '{sub_id}' THEN {info.requests}")
+            case_parts.append(f"WHEN subscription_status = '{sub_id}' THEN {info.sub_queries}")
         case_sql = " ".join(case_parts)
         query = f"""
             UPDATE users 
             SET used_queries = 0,
                 sub_queries = CASE {case_sql} ELSE sub_queries END,
                 last_active = CURRENT_TIMESTAMP
-            WHERE subscription_status != 'inactive'
         """
         async with self.pool.acquire() as conn:
             await conn.execute(query)
