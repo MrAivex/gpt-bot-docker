@@ -122,9 +122,9 @@ class WebhookHandler:
                 return web.Response(status=200)
 
             payment_obj = data.get('object', {})
-            user_id, chat_id, sub_name = await self.container.payment_service.handle_successful_payment(payment_obj)
+            user_id, chat_id, message = await self.container.payment_service.handle_successful_payment(payment_obj)
             if user_id and chat_id:
-                await self.bot.send_message(chat_id, f"✅ Оплата прошла успешно! Подписка '{sub_name}' активирована.")
+                await self.bot.send_message(chat_id, f"✅ Оплата прошла успешно! {message}")
             return web.Response(status=200)
         except Exception as e:
             logger.error(f"YooKassa webhook error: {e}")

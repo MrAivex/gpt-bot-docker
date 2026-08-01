@@ -30,11 +30,9 @@ class PaymentService:
         return payment_url
 
     async def handle_successful_payment(self, payment_data: dict):
-        """Обрабатывает уведомление об успешном платеже."""
         metadata = payment_data.get('metadata', {})
         user_id = metadata.get('user_id')
         sub_id = metadata.get('sub_id')
-        chat_id = metadata.get('chat_id')
 
         if not user_id or not sub_id:
             logger.error(f"Нет user_id или sub_id в метаданных: {metadata}")
@@ -42,12 +40,10 @@ class PaymentService:
 
         user_id = int(user_id)
 
-        # Если chat_id не пришёл в метаданных – получим из БД
         if not chat_id:
             user = await self.user_repo.get_user(user_id)
             chat_id = user.chat_id if user else None
 
-        # Активируем подписку или пакет через SubscriptionService
         success, message = await self.subscription_service.activate_or_extend(user_id, sub_id)
         if success:
             logger.info(f"Платёж обработан: {message}")
