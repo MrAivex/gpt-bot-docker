@@ -61,7 +61,8 @@ class AppContainer:
                 if "Ошибка" in result:
                     return None, result
                 return result, None
-        self.payment_service = PaymentService(self.user_repo, LegacyYooKassaAdapter())
+        self.payment_service = PaymentService(self.user_repo, LegacyYooKassaAdapter(), 
+                                              self.subscription_service)
 
         # Шаблоны
         self.messages = Messages()
