@@ -39,9 +39,9 @@ ADMIN_CHAT_ID=273542052
 # Ссылка для уведомлений Юкассы: https://max-gpt-ai-helper-bot.ru/yookassa-webhook
 
 #------------ТЕСТОВЫЙ МАГАЗИН--------------------------------------------------------------------------------
-# PAYMENT_TOKEN="test_xNodPvs81RMcfJm0G46N2Siu9-EJOnMJWyNtQxA4n_I"
-# SHOP_ID="1342218"
+PAYMENT_TOKEN="test_xNodPvs81RMcfJm0G46N2Siu9-EJOnMJWyNtQxA4n_I"
+SHOP_ID="1342218"
 
 #------------РЕАЛЬНЫЙ МАГАЗИН--------------------------------------------------------------------------------
-PAYMENT_TOKEN="live_UBT3bTpvjjaxLSXxm4PD7GtFSjhIUOAGQNbjd2yFYks"
-SHOP_ID="1336875"
+# PAYMENT_TOKEN="live_UBT3bTpvjjaxLSXxm4PD7GtFSjhIUOAGQNbjd2yFYks"
+# SHOP_ID="1336875"
