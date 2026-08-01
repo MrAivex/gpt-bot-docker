@@ -25,7 +25,7 @@ async def create_payment_link(sub_id, user_id, subscription_end, email):
                 "return_url": f"{RETURN_URL}" # Ссылка на вашего бота
             },
             "capture": True,
-            "save_payment_method": True,
+            "save_payment_method": False,
             "description": description,
             "metadata": {
                 "subscription_end": str(subscription_end),

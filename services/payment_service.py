@@ -42,10 +42,10 @@ class PaymentService:
 
         user_id = int(user_id)
         # Сохраняем payment_token для автопродления
-        payment_method = payment_data.get('payment_method', {})
-        if payment_method.get('saved'):
-            token = payment_method.get('id')
-            await self.user_repo.update_user_field(user_id, 'payment_token', token)
+        # payment_method = payment_data.get('payment_method', {})
+        # if payment_method.get('saved'):
+        #     token = payment_method.get('id')
+        #     await self.user_repo.update_user_field(user_id, 'payment_token', token)
 
         # Активируем подписку через SubscriptionService
         # (можно инжектировать SubscriptionService или вызывать его метод напрямую)
