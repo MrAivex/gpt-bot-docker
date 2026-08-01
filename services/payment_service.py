@@ -33,6 +33,7 @@ class PaymentService:
         metadata = payment_data.get('metadata', {})
         user_id = metadata.get('user_id')
         sub_id = metadata.get('sub_id')
+        chat_id = metadata.get('chat_id')
 
         if not user_id or not sub_id:
             logger.error(f"Нет user_id или sub_id в метаданных: {metadata}")
