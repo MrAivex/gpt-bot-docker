@@ -86,39 +86,22 @@ class MaxBot:
         
     async def send_photo(self, chat_id: int, image_url: str, caption: str = None):
         url = f"{self.base_url}/messages?chat_id={chat_id}"
-        
-        attachment = {
-            "type": "image",
-            "payload": {"url": image_url}
-        }
-        
-        payload = {
-            "attachments": [attachment],
-            "format": "markdown"
-        }
+        attachment = {"type": "image", "payload": {"url": image_url}}
+        payload = {"attachments": [attachment], "format": "markdown"}
         if caption:
             payload["text"] = caption
-        
         headers = {"Authorization": self.token, "Content-Type": "application/json"}
-        
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.post(url, json=payload, headers=headers) as resp:
-                    if resp.status in [200, 201]:
+                    if resp.status in (200, 201):
                         data = await resp.json()
-                        msg_id = (
-                            data.get('id') or 
-                            data.get('message_id') or 
-                            (data.get('message') or {}).get('id') or
-                            (data.get('message', {}).get('body', {}) or {}).get('mid')
-                        )
-                        return msg_id
+                        return data.get('id') or data.get('message_id')
                     else:
-                        logger.error(f"Ошибка при отправке фото: {await resp.text()}")
-                        return None
+                        logger.error(f"Ошибка send_photo: {await resp.text()}")
         except Exception as e:
             logger.error(f"Ошибка send_photo: {e}")
-            return None
+        return None
         
     async def send_document(self, chat_id: int, file_content: str, caption: str = None):
         """

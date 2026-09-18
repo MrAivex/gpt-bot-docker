@@ -81,21 +81,52 @@ class MessageHandler:
 
         # 6. Обработка ответа
         if isinstance(ai_response, str) and ai_response.startswith("data:image/"):
-            b64_content = ai_response.split(",", 1)[1]
-            import base64, os, uuid, asyncio
+            import base64, os, uuid
+            b64_part = ai_response.split(",", 1)[1]
+            image_bytes = base64.b64decode(b64_part)
+
             filename = f"{uuid.uuid4()}.png"
             filepath = os.path.join('temp_images', filename)
             os.makedirs('temp_images', exist_ok=True)
             with open(filepath, 'wb') as f:
-                f.write(base64.b64decode(b64_content))
-            await asyncio.sleep(0.5)  # даём файловой системе сохранить
-            file_url = f"https://empty-snail-52.loca.lt/temp_images/{filename}"
+                f.write(image_bytes)
+
+            # Формируем публичный URL через домен из WEBHOOK_URL
+            from config.main import WEBHOOK_URL
+            domain = WEBHOOK_URL.split('/')[2]       # например, max-gpt-ai-helper-bot.ru
+            file_url = f"https://{domain}/temp_images/{filename}"
+
             if stub_msg_id:
-                await self.bot.edit_message(chat_id, stub_msg_id, "✅ Изображение готово:")
+                try:
+                    await self.bot.edit_message(chat_id, stub_msg_id, "✅ Изображение готово:")
+                except Exception:
+                    pass
+
+            await self.bot.send_photo(chat_id, file_url, caption=user_text)
+
+        elif isinstance(ai_response, str) and ai_response.startswith("BASE64:"):
+            # Альтернативный формат от некоторых провайдеров
+            import base64, os, uuid
+            b64_part = ai_response.split(":", 1)[1]
+            image_bytes = base64.b64decode(b64_part)
+            filename = f"{uuid.uuid4()}.png"
+            filepath = os.path.join('temp_images', filename)
+            os.makedirs('temp_images', exist_ok=True)
+            with open(filepath, 'wb') as f:
+                f.write(image_bytes)
+
+            from config.main import WEBHOOK_URL
+            domain = WEBHOOK_URL.split('/')[2]
+            file_url = f"https://{domain}/temp_images/{filename}"
+
+            if stub_msg_id:
+                try:
+                    await self.bot.edit_message(chat_id, stub_msg_id, "✅ Изображение готово:")
+                except Exception:
+                    pass
             await self.bot.send_photo(chat_id, file_url, caption=user_text)
 
         elif isinstance(ai_response, str) and ai_response.startswith("http"):
-            # Прямая ссылка (на случай других моделей)
             if stub_msg_id:
                 await self.bot.edit_message(chat_id, stub_msg_id, "✅ Изображение готово:")
             await self.bot.send_photo(chat_id, ai_response, caption=user_text)

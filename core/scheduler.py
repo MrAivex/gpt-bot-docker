@@ -1,6 +1,17 @@
 # core/scheduler.py
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from config.logger import logger
+import os, time
+
+
+async def cleanup_temp_images():
+            folder = 'temp_images'
+            now = time.time()
+            for filename in os.listdir(folder):
+                filepath = os.path.join(folder, filename)
+                if os.path.isfile(filepath) and now - os.path.getmtime(filepath) > 3600:
+                    os.remove(filepath)
+                    
 
 class SchedulerService:
     def __init__(self, container):
@@ -8,6 +19,11 @@ class SchedulerService:
         self.scheduler = AsyncIOScheduler()
 
     def start(self):
+        # Очистка папки с изображениями
+        self.scheduler.add_job(
+            cleanup_temp_images, 'interval', hours=1
+            )
+
         # Проверка истекших подписок раз в день в 00:30
         self.scheduler.add_job(
             self.container.subscription_service.deactivate_expired,
