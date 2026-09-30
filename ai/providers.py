@@ -60,6 +60,8 @@ class OpenAIProvider(AIProvider):
                 size="1024x1024",
                 # quality="low"  # опционально
             )
+            image = response.data[0]
+            logger.info(f"Image response: url={bool(image.url)}, b64={bool(image.b64_json)}")
             return self._handle_image_response(response)
         except Exception as e:
             logger.error(f"Ошибка генерации ({self.model}): {e}")
@@ -101,10 +103,21 @@ MODELS = {
         "kwargs": {"model": "gpt-4o", "cost_per_request": 15, "supports_image": False},
         "type": "text"
     },
-    "gpt-image-2": { # 10 руб./ запрос
-        "provider_class": OpenAIProvider,
-        "kwargs": {"model": "gpt-image-2", "cost_per_request": 75, "supports_image": True},
-        "type": "image"
+
+    # "gpt-image-2": { # 10 руб./ запрос
+    #     "provider_class": OpenAIProvider,
+    #     "kwargs": {"model": "gpt-image-2", "cost_per_request": 75, "supports_image": True},
+    #     "type": "image"
+    # },
+
+    "gemini-3-pro-image": { # 1.1 руб/запрос
+    "provider_class": OpenAIProvider,
+    "kwargs": {
+        "model": "gemini-3-pro-image",
+        "cost_per_request": 10,   # с запасом ~30% на вариативность токенов и кэш
+        "supports_image": True
+    },
+    "type": "image"
     },
     # будущие модели:
     # "gpt-4o-mini": {
