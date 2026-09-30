@@ -58,7 +58,7 @@ class OpenAIProvider(AIProvider):
                 model=self.model,
                 prompt=prompt,
                 size="1024x1024",
-                # quality="low"  # опционально
+                quality="low",  # опционально
             )
             # image = response.data[0]
             # logger.info(f"Image response: url={bool(image.url)}, b64={bool(image.b64_json)}")
@@ -76,6 +76,7 @@ class OpenAIProvider(AIProvider):
                 image=image_url,
                 prompt=prompt,
                 size="1024x1024",
+                quality="low",
             )
             return self._handle_image_response(response)
         except Exception as e:
